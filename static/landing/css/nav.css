@@ -57,8 +57,11 @@
     background: rgba(5, 7, 13, 0.85);
     backdrop-filter: blur(10px);
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
+    padding: 16px;
+    box-sizing: border-box;
+    overflow-y: auto;
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.25s ease;
@@ -90,13 +93,17 @@
     width: min(96vw, 1380px);
     height: calc(100vh - 32px);
     max-height: calc(100vh - 32px);
+    box-sizing: border-box;
+    min-height: 0;
 }
 
 .nav-modal-content.is-audit-wide #nav-modal-body {
+    flex: 1 1 0;
     min-height: 0;
-    flex: 1 1 auto;
+    height: 0;
     overflow-y: auto !important;
     overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
 }
 
 .kpi-cards-grid {
@@ -304,7 +311,9 @@
 
 .audit-table-wrap {
     width: 100%;
+    min-height: 0;
     overflow-x: auto;
+    overflow-y: visible;
     overscroll-behavior: contain;
 }
 
