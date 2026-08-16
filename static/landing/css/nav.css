@@ -88,12 +88,15 @@
 
 .nav-modal-content.is-audit-wide {
     width: min(96vw, 1380px);
+    height: calc(100vh - 32px);
     max-height: calc(100vh - 32px);
 }
 
 .nav-modal-content.is-audit-wide #nav-modal-body {
     min-height: 0;
-    overflow: auto !important;
+    flex: 1 1 auto;
+    overflow-y: auto !important;
+    overflow-x: hidden;
 }
 
 .kpi-cards-grid {
