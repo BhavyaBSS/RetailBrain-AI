@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RetailBrain AI — Store Network</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- MapLibre GL JS: free, open-source, no API key, no billing -->
+    <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet">
+    <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+
+    <!-- Turf: combines detailed ward polygons into a few clean city regions -->
+    <script src="https://cdn.jsdelivr.net/npm/@turf/turf@7.2.0/turf.min.js"></script>
+
+    <link rel="stylesheet" href="/static/landing/css/landing.css">
+    <link rel="stylesheet" href="/static/landing/css/cloud-transition.css">
+    <link rel="stylesheet" href="/static/landing/css/india-map.css">
+    <link rel="stylesheet" href="/static/landing/css/store-inventory.css?v=20260816-2">
+    <link rel="stylesheet" href="/static/landing/css/transfer-flow.css?v=20260817-1">
+    <link rel="stylesheet" href="/static/landing/css/purchase-flow.css?v=20260816-2">
+    <link rel="stylesheet" href="/static/landing/css/nav.css?v=20260816-7">
+</head>
+<body class="space-theme">
+
+    <canvas id="starfield"></canvas>
+
+    <header class="map-header">
+        <div class="map-header-left">
+            <div id="breadcrumb-container"></div>
+            <h1 class="map-title" id="map-title-heading">RetailBrain <span class="accent">AI</span></h1>
+            <p class="map-subtitle" id="map-subtitle-text">Select a city to view its store network</p>
+        </div>
+        <div class="map-header-right" id="header-nav-right"></div>
+    </header>
+
+    <div id="map"></div>
+
+    <script src="/static/landing/js/cloud-transition.js"></script>
+    <script src="/static/landing/js/india-map.js?v=20260817-3"></script>
+    <script src="/static/landing/js/store-inventory.js?v=20260816-4"></script>
+    <script src="/static/landing/js/transfer-flow.js?v=20260817-1"></script>
+    <script src="/static/landing/js/purchase-flow.js?v=20260816-3"></script>
+    <script src="/static/landing/js/nav.js?v=20260816-7"></script>
+</body>
+</html>

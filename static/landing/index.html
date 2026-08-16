@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RetailBrain AI — Central Inventory Command Tower</title>
+
+    <!-- Same font system as the dashboard, for visual continuity -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@500;700&family=Noto+Sans+Bengali:wght@500;700&family=Noto+Sans+Gurmukhi:wght@500;700&family=Noto+Sans+Tamil:wght@500;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="/static/landing/css/landing.css">
+    <link rel="stylesheet" href="/static/landing/css/cloud-transition.css">
+</head>
+<body class="space-theme">
+
+    <!-- Ambient starfield, generated in JS, sits behind everything -->
+    <canvas id="starfield"></canvas>
+
+    <main class="landing-stage">
+
+        <!-- Left half: identity -->
+        <section class="identity-panel">
+            <p class="eyebrow" id="welcome-cycle" lang="en">Welcome</p>
+            <h1 class="brand-title">RetailBrain <span class="accent">AI</span></h1>
+            <p class="brand-subtitle">Central Inventory Command Tower — AI-powered demand forecasting for India's dark stores.</p>
+        </section>
+
+        <!-- Right half: the globe -->
+        <section class="globe-panel" id="globe-panel" aria-label="Interactive rotating Earth, click to continue">
+            <canvas id="globe-canvas"></canvas>
+        </section>
+
+    </main>
+
+    <!-- Three.js (classic global build, no bundler needed) -->
+    <script src="https://unpkg.com/three@0.128.0/build/three.min.js"></script>
+
+    <script src="/static/landing/js/language-cycle.js"></script>
+    <script src="/static/landing/js/cloud-transition.js"></script>
+    <script src="/static/landing/js/globe.js"></script>
+</body>
+</html>

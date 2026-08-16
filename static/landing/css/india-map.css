@@ -1,0 +1,304 @@
+/* ==========================================================================
+   RetailBrain AI — India Map (Phase 4)
+   ========================================================================== */
+
+html, body {
+    height: 100%;
+    overflow: hidden;
+}
+
+.map-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 10;
+    padding: 24px 40px 0;
+    pointer-events: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.map-header-left {
+    pointer-events: auto;
+}
+
+.back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-cyan, #00f2fe);
+    text-decoration: none;
+    margin-bottom: 6px;
+    background: rgba(0, 242, 254, 0.1);
+    border: 1px solid rgba(0, 242, 254, 0.25);
+    padding: 4px 12px;
+    border-radius: 20px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.back-link:hover {
+    background: rgba(0, 242, 254, 0.2);
+    box-shadow: 0 0 12px rgba(0, 242, 254, 0.3);
+    transform: translateX(-2px);
+}
+
+.map-title {
+    font-family: var(--font-heading);
+    font-size: clamp(1.6rem, 2.6vw, 2.2rem);
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.map-title .accent {
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.map-subtitle {
+    margin-top: 4px;
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+}
+
+#map {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: #05070d;
+}
+
+/* ---------- Custom city marker ---------- */
+.city-marker {
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    box-sizing: border-box;
+    cursor: pointer;
+}
+
+.city-dot {
+    width: 14px;
+    height: 14px;
+    box-sizing: border-box;
+    border-radius: 50%;
+    background: var(--color-cyan);
+    box-shadow: 0 0 0 0 rgba(0, 242, 254, 0.55);
+    animation: city-pulse 2.4s infinite;
+    transition: transform 0.2s ease;
+}
+
+.city-marker:hover .city-dot {
+    transform: scale(1.25);
+}
+
+@keyframes city-pulse {
+    0%   { box-shadow: 0 0 0 0 rgba(0, 242, 254, 0.55); }
+    70%  { box-shadow: 0 0 0 14px rgba(0, 242, 254, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(0, 242, 254, 0); }
+}
+
+.city-label {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    white-space: nowrap;
+    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.8);
+    pointer-events: none;
+}
+
+/* ---------- Hover info card — hidden unless hovering the marker ---------- */
+.city-info {
+    position: absolute;
+    bottom: calc(100% + 14px);
+    left: 50%;
+    transform: translateX(-50%) translateY(6px);
+    min-width: 200px;
+    background: var(--deep-space, #0b0f1a);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 12px;
+    padding: 14px 16px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+    z-index: 20;
+}
+
+.city-marker:hover .city-info {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+.city-info::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 7px solid transparent;
+    border-top-color: var(--deep-space, #0b0f1a);
+}
+
+.city-info-name {
+    font-family: var(--font-heading);
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+}
+
+.city-info-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+    padding: 3px 0;
+}
+
+.city-info-row .value {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.city-info-row .value.alert {
+    color: #ff6b6b;
+}
+
+.city-info-row .value.loading {
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+/* ---------- MapLibre default control tweaks ---------- */
+.maplibregl-ctrl-attrib {
+    background: rgba(5, 7, 13, 0.6) !important;
+}
+.maplibregl-ctrl-attrib a {
+    color: var(--text-secondary) !important;
+}
+
+/* ---------- Store pin markers ---------- */
+.store-marker {
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    box-sizing: border-box;
+    cursor: pointer;
+}
+
+.store-dot {
+    width: 16px;
+    height: 16px;
+    box-sizing: border-box;
+    border-radius: 50%;
+    background: var(--color-cyan, #00f2fe);
+    border: 2px solid #ffffff;
+    box-shadow: 0 0 10px rgba(0, 242, 254, 0.7);
+    transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.store-dot.has-alert {
+    background: #ff4757;
+    box-shadow: 0 0 12px rgba(255, 71, 87, 0.8);
+}
+
+.store-marker:hover .store-dot {
+    transform: scale(1.35);
+}
+
+.store-label {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #e2e8f0;
+    white-space: nowrap;
+    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.9);
+    pointer-events: none;
+    background: rgba(7, 9, 14, 0.75);
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.store-info {
+    position: absolute;
+    bottom: calc(100% + 12px);
+    left: 50%;
+    transform: translateX(-50%) translateY(6px);
+    min-width: 220px;
+    background: var(--deep-space, #0b0f1a);
+    border: 1px solid rgba(0, 242, 254, 0.3);
+    border-radius: 12px;
+    padding: 12px 14px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.8);
+    z-index: 25;
+}
+
+.store-marker:hover .store-info {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateX(-50%) translateY(0);
+}
+
+.store-info-title {
+    font-family: var(--font-heading);
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text-primary, #ffffff);
+    margin-bottom: 2px;
+}
+
+.store-info-locality {
+    font-size: 0.78rem;
+    color: var(--color-cyan, #00f2fe);
+    margin-bottom: 8px;
+}
+
+.store-info-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    color: var(--text-secondary, #94a3b8);
+    padding: 2px 0;
+}
+
+.store-info-row .value {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 600;
+    color: #ffffff;
+}
+
+.store-info-row .value.alert {
+    color: #ff6b6b;
+}
+
+.store-click-hint {
+    margin-top: 8px;
+    padding-top: 6px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 0.75rem;
+    color: var(--color-cyan, #00f2fe);
+    text-align: center;
+    font-weight: 600;
+}

@@ -1,0 +1,72 @@
+/* ==========================================================================
+   RetailBrain AI — Cloud transition layers (Phase 3)
+   Pure CSS puffs, no external images — zero network dependency.
+   ========================================================================== */
+
+#cloud-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.cloud-layer {
+    position: absolute;
+    left: -10%;
+    width: 120%;
+    height: 65vh;
+    background: #eef2f8; /* solid base fill — guarantees full coverage regardless of puff placement */
+    transition: transform 900ms cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+.cloud-layer-top {
+    top: 0;
+    transform: translateY(-100%);
+}
+
+.cloud-layer-bottom {
+    bottom: 0;
+    transform: translateY(100%);
+}
+
+#cloud-overlay.is-covered .cloud-layer-top {
+    transform: translateY(0);
+}
+
+#cloud-overlay.is-covered .cloud-layer-bottom {
+    transform: translateY(0);
+}
+
+#cloud-overlay.is-parting .cloud-layer-top {
+    transform: translateY(-115%);
+}
+
+#cloud-overlay.is-parting .cloud-layer-bottom {
+    transform: translateY(115%);
+}
+
+.puff {
+    position: absolute;
+    border-radius: 50%;
+    background: #eef2f8;
+    filter: blur(26px);
+}
+
+/* Top layer puffs — denser toward its bottom edge, since that edge meets the middle */
+.cloud-layer-top .puff:nth-child(1) { width: 34%; height: 60%; left: 2%;  bottom: -10%; }
+.cloud-layer-top .puff:nth-child(2) { width: 40%; height: 65%; left: 24%; bottom: -14%; background: #e4e9f2; }
+.cloud-layer-top .puff:nth-child(3) { width: 36%; height: 58%; left: 52%; bottom: -8%;  }
+.cloud-layer-top .puff:nth-child(4) { width: 42%; height: 62%; left: 70%; bottom: -12%; background: #e9edf5; }
+.cloud-layer-top .puff:nth-child(5) { width: 30%; height: 50%; left: 88%; bottom: -6%;  }
+
+/* Bottom layer puffs — mirrored, denser toward its top edge */
+.cloud-layer-bottom .puff:nth-child(1) { width: 34%; height: 60%; left: -2%; top: -10%; background: #e4e9f2; }
+.cloud-layer-bottom .puff:nth-child(2) { width: 40%; height: 65%; left: 20%; top: -14%; }
+.cloud-layer-bottom .puff:nth-child(3) { width: 38%; height: 58%; left: 48%; top: -8%;  background: #e9edf5; }
+.cloud-layer-bottom .puff:nth-child(4) { width: 36%; height: 62%; left: 68%; top: -12%; }
+.cloud-layer-bottom .puff:nth-child(5) { width: 30%; height: 50%; left: 90%; top: -6%;  background: #e4e9f2; }
+
+@media (prefers-reduced-motion: reduce) {
+    .cloud-layer { transition: none; }
+}

@@ -1,0 +1,36 @@
+Product_ID,Product_Name,Category,Brand,MRP,Selling_Price,Cost_Price,Shelf_Life,Unit
+PROD-001,English Oven Milk Bread,"Dairy, Bread & Eggs",English Oven,55.00,50.00,40.00,5,packet
+PROD-002,Bonn White Bread,"Dairy, Bread & Eggs",Bonn,35.00,33.00,25.00,5,packet
+PROD-003,iD Idli & Dosa Batter - 1 kg,"Dairy, Bread & Eggs",iD Fresh,90.00,80.00,64.00,7,packet
+PROD-004,Haldiram's Aloo Bhujia,Chips & Namkeen,Haldiram's,120.00,110.00,88.00,180,packet
+PROD-005,Haldiram's Punjabi Tadka Namkeen Snacks,Chips & Namkeen,Haldiram's,60.00,55.00,44.00,180,packet
+PROD-006,Haldiram's Lite Mixture Namkeen,Chips & Namkeen,Haldiram's,45.00,40.00,32.00,180,packet
+PROD-007,Yu 100% Natural Coconut Water,Drinks & Juices,Yu,50.00,46.00,35.00,180,packet
+PROD-008,Raw Pressery Coconut Water,Drinks & Juices,Raw Pressery,70.00,65.00,50.00,180,packet
+PROD-009,Real Activ 100% Tender Coconut Water,Drinks & Juices,Real Activ,55.00,50.00,38.00,180,packet
+PROD-010,Lipton Honey Lemon Green Tea Bags,"Tea, Coffee & Milk Drinks",Lipton,190.00,172.00,130.00,270,packet
+PROD-011,Chaayos Masala Instant Tea Premix Regular Sugar,"Tea, Coffee & Milk Drinks",Chaayos,160.00,149.00,115.00,270,packet
+PROD-012,Nestea Ice Tea Premix - Lemon Flavour,"Tea, Coffee & Milk Drinks",Nestea,200.00,186.00,140.00,270,packet
+PROD-013,Creative Space Assignment A4 Sheets (One Side Ruled) (White),Stationery & Games,Creative Space,55.00,48.00,35.00,365,packet
+PROD-014,DOMS Max Water Colour Sketch Pens (Multicolour),Stationery & Games,DOMS,40.00,35.00,25.00,365,packet
+PROD-015,Creative Space 2mm Graph A4 Sheets (Green),Stationery & Games,Creative Space,55.00,49.00,36.00,365,packet
+PROD-016,Nayasa Frosty Bathroom Mug (Blue),Home & Lifestyle,Nayasa,80.00,69.00,50.00,365,piece
+PROD-017,"myTrident Comfort Living Cotton Bath Towel (27.5"" x 55.1"", Black Currant)",Home & Lifestyle,myTrident,349.00,299.00,220.00,365,piece
+PROD-018,Homestrap Plastic Cloth Hanger Set (Black),Home & Lifestyle,Homestrap,299.00,269.00,200.00,365,piece
+PROD-019,Onion (Pyaz),Vegetables & Fruits,Fresh,50.00,42.00,32.00,4,kg
+PROD-020,Potato (Aloo),Vegetables & Fruits,Fresh,30.00,23.00,18.00,4,kg
+PROD-021,Hybrid Tomato (Tamatar),Vegetables & Fruits,Fresh,45.00,38.00,28.00,4,kg
+PROD-022,Parle Melody Bigger Chocolaty Toffee,Sweets & Chocolates,Parle,55.00,50.00,38.00,180,packet
+PROD-023,Wrigley's Doublemint Peppermint Chewy Mint Candies,Sweets & Chocolates,Wrigley's,50.00,45.00,35.00,180,packet
+PROD-024,Orbit Mixed Fruit Flavour Chewing Gum (Sugar Free),Sweets & Chocolates,Orbit,50.00,45.00,35.00,180,packet
+PROD-025,Kellogg's Original Corn Flakes,Dry Fruits & Cereals,Kellogg's,130.00,115.00,90.00,270,packet
+PROD-026,Kellogg's Multigrain Chocos Crunchy Bites Kids Cereal,Dry Fruits & Cereals,Kellogg's,180.00,157.00,120.00,270,packet
+PROD-027,Kellogg's Chocos Fills Double Chocolaty Cereal,Dry Fruits & Cereals,Kellogg's,110.00,95.00,72.00,270,packet
+PROD-028,MTR Gulab Jamun Mix,Instant Food,MTR,150.00,135.00,100.00,270,packet
+PROD-029,Pillsbury Chocolate Flavour Pancake Mix,Instant Food,Pillsbury,120.00,102.00,78.00,270,packet
+PROD-030,Brown & Polson Vanilla Custard Powder,Instant Food,Brown & Polson,45.00,38.00,28.00,270,packet
+PROD-031,Roli Chawal Set with Chandan & Mishri by ServD...,Festive Specials,ServD,75.00,59.00,40.00,365,piece
+PROD-032,Raksha Bandhan Roli Chawal by Vidya,Festive Specials,Vidya,49.00,39.00,25.00,365,piece
+PROD-033,Creative Space Satin Decoration Ribbon (7 m) (Red),Festive Specials,Creative Space,25.00,21.00,15.00,365,piece
+PROD-034,Fevicryl Acrylic Color (Multicolour),Festive Specials,Fevicryl,250.00,224.00,160.00,365,piece
+PROD-035,Designer Rakhi Set,Festive Specials,Designer,69.00,55.00,40.00,365,piece

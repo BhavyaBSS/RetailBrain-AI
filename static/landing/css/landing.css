@@ -1,0 +1,132 @@
+/* ==========================================================================
+   RetailBrain AI — Landing / Space Intro
+   Extends the dashboard's existing design tokens (style.css) for continuity.
+   ========================================================================== */
+
+:root {
+    --bg-base: #07090e;
+    --bg-void: #05070d;
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+
+    --color-cyan: #00f2fe;
+    --color-cyan-soft: #4facfe;
+    --primary-gradient: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
+
+    --font-heading: 'Outfit', sans-serif;
+    --font-body: 'Inter', sans-serif;
+
+    /* Script-specific fonts, used only for their language's welcome line */
+    --font-devanagari: 'Noto Sans Devanagari', sans-serif;
+    --font-bengali: 'Noto Sans Bengali', sans-serif;
+    --font-gurmukhi: 'Noto Sans Gurmukhi', sans-serif;
+    --font-tamil: 'Noto Sans Tamil', sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+    height: 100%;
+    background: var(--bg-void);
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    overflow: hidden;
+}
+
+/* ---------- Starfield background ---------- */
+#starfield {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    background: radial-gradient(ellipse at 70% 50%, #0d1220 0%, var(--bg-void) 70%);
+}
+
+/* ---------- Layout ---------- */
+.landing-stage {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    height: 100vh;
+    width: 100%;
+    padding: 0 6vw;
+    gap: 4vw;
+}
+
+.identity-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 18px;
+    max-width: 560px;
+}
+
+.eyebrow {
+    font-family: var(--font-heading);
+    font-size: clamp(1.4rem, 2.4vw, 2.1rem);
+    font-weight: 600;
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    min-height: 1.4em;
+    transition: opacity 0.6s ease;
+}
+
+.brand-title {
+    font-family: var(--font-heading);
+    font-size: clamp(2.6rem, 5.5vw, 4.2rem);
+    font-weight: 700;
+    line-height: 1.05;
+    color: var(--text-primary);
+}
+
+.brand-title .accent {
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.brand-subtitle {
+    font-size: clamp(0.95rem, 1.1vw, 1.1rem);
+    color: var(--text-secondary);
+    line-height: 1.6;
+    max-width: 460px;
+}
+
+/* ---------- Globe panel ---------- */
+.globe-panel {
+    position: relative;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+#globe-canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 860px) {
+    .landing-stage {
+        grid-template-columns: 1fr;
+        grid-template-rows: 1fr 1fr;
+        padding: 6vh 6vw;
+        gap: 2vh;
+        text-align: center;
+    }
+    .identity-panel { align-items: center; max-width: 100%; }
+    .brand-subtitle { max-width: 100%; }
+}
+
+/* ---------- Reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+    .eyebrow { transition: none; }
+}

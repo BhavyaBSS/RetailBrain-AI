@@ -1,0 +1,387 @@
+/* ==========================================================================
+   RetailBrain AI — Phase 11 Global Navigation Header & Command Drawers
+   ========================================================================== */
+
+.global-nav-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(11, 15, 26, 0.85);
+    border: 1px solid rgba(0, 242, 254, 0.2);
+    border-radius: 30px;
+    padding: 4px 8px;
+    backdrop-filter: blur(10px);
+    pointer-events: auto;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.nav-link-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary, #94a3b8);
+    font-family: var(--font-body, 'Inter', sans-serif);
+    font-size: 0.82rem;
+    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: 20px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.nav-link-btn:hover, .nav-link-btn.active {
+    background: rgba(0, 242, 254, 0.15);
+    color: var(--color-cyan, #00f2fe);
+}
+
+.nav-link-btn.btn-dashboard-link {
+    background: rgba(255, 255, 255, 0.06);
+    color: #e2e8f0;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.nav-link-btn.btn-dashboard-link:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+}
+
+/* Modal overlays for Executive KPIs & Dispatch History */
+.nav-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 400;
+    background: rgba(5, 7, 13, 0.85);
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+}
+
+.nav-modal-backdrop.is-open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.nav-modal-content {
+    width: clamp(380px, 85vw, 800px);
+    max-height: 85vh;
+    background: rgba(11, 15, 26, 0.98);
+    border: 1px solid rgba(0, 242, 254, 0.3);
+    border-radius: 18px;
+    padding: 24px 28px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.nav-modal-content.is-wide {
+    width: clamp(680px, 92vw, 1120px);
+}
+
+.nav-modal-content.is-audit-wide {
+    width: min(96vw, 1380px);
+    max-height: calc(100vh - 32px);
+}
+
+.nav-modal-content.is-audit-wide #nav-modal-body {
+    min-height: 0;
+    overflow: auto !important;
+}
+
+.kpi-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-top: 16px;
+}
+
+.kpi-card-box {
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 16px;
+}
+
+.kpi-card-title {
+    font-size: 0.78rem;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+}
+
+.kpi-card-number {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.kpi-card-number.cyan { color: var(--color-cyan, #00f2fe); }
+.kpi-card-number.emerald { color: #34d399; }
+.kpi-card-number.rose { color: #f87171; }
+
+.kpi-card-detail {
+    margin-top: 4px;
+    color: #94a3b8;
+    font-size: 0.74rem;
+}
+
+.forecast-modal-layout {
+    display: grid;
+    grid-template-columns: 250px minmax(0, 1fr);
+    gap: 20px;
+}
+
+.forecast-controls-panel,
+.forecast-visual-panel {
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    background: rgba(7, 9, 14, 0.58);
+    padding: 18px;
+}
+
+.forecast-controls-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.forecast-field-label {
+    margin-top: 5px;
+    color: #94a3b8;
+    font-size: 0.78rem;
+    font-weight: 700;
+}
+
+.forecast-controls-panel .btn-confirm-action {
+    margin-top: 10px;
+}
+
+.forecast-model-note {
+    margin-top: 4px;
+    color: #64748b;
+    font-size: 0.7rem;
+    line-height: 1.45;
+    text-align: center;
+}
+
+.forecast-chart-title {
+    color: #e2e8f0;
+    font-family: var(--font-heading, 'Outfit', sans-serif);
+    font-weight: 700;
+    font-size: 0.9rem;
+    margin-bottom: 12px;
+}
+
+.forecast-chart-container {
+    min-height: 390px;
+}
+
+.forecast-stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.forecast-stats-row > div {
+    padding: 9px 12px;
+    border-radius: 9px;
+    background: rgba(15, 23, 42, 0.75);
+}
+
+.forecast-stats-row span,
+.forecast-stats-row b {
+    display: block;
+}
+
+.forecast-stats-row span {
+    color: #94a3b8;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+}
+
+.forecast-stats-row b {
+    margin-top: 2px;
+    color: #67e8f9;
+    font: 700 0.86rem 'JetBrains Mono', monospace;
+}
+
+.forecast-svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-height: 330px;
+}
+
+.forecast-grid-line {
+    stroke: rgba(148, 163, 184, 0.13);
+    stroke-width: 1;
+}
+
+.forecast-axis-label {
+    fill: #64748b;
+    font-size: 10px;
+}
+
+.forecast-line {
+    fill: none;
+    stroke: #00f2fe;
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    filter: drop-shadow(0 0 5px rgba(0, 242, 254, 0.65));
+}
+
+.forecast-point {
+    fill: #07111d;
+    stroke: #67e8f9;
+    stroke-width: 2;
+}
+
+.nav-loading-state,
+.nav-error-state {
+    padding: 42px 20px;
+    text-align: center;
+    color: #94a3b8;
+}
+
+.nav-error-state {
+    color: #fb7185;
+}
+
+.audit-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 10px;
+    color: #94a3b8;
+    font-size: 0.76rem;
+}
+
+.audit-toolbar-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.audit-toolbar-btn,
+.audit-remove-btn {
+    border: 1px solid rgba(148, 163, 184, 0.28);
+    border-radius: 8px;
+    background: rgba(15, 23, 42, 0.75);
+    color: #cbd5e1;
+    padding: 7px 10px;
+    font: 700 0.7rem var(--font-body, 'Inter', sans-serif);
+    cursor: pointer;
+}
+
+.audit-toolbar-btn:hover,
+.audit-remove-btn:hover {
+    border-color: rgba(0, 242, 254, 0.55);
+    color: #67e8f9;
+}
+
+.audit-download-btn {
+    border-color: rgba(0, 242, 254, 0.42);
+    background: rgba(0, 242, 254, 0.1);
+    color: #67e8f9;
+}
+
+.audit-table-wrap {
+    width: 100%;
+    overflow-x: auto;
+    overscroll-behavior: contain;
+}
+
+.audit-table {
+    width: 100%;
+    min-width: 1080px;
+}
+
+.audit-table th,
+.audit-table td {
+    vertical-align: middle;
+}
+
+.audit-table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: #111a2d;
+}
+
+.audit-row-completed {
+    background: rgba(16, 185, 129, 0.045);
+}
+
+.audit-row-removed {
+    opacity: 0.52;
+}
+
+.audit-countdown {
+    color: #67e8f9;
+    font: 800 0.8rem 'JetBrains Mono', monospace;
+    white-space: nowrap;
+}
+
+.audit-countdown.is-complete {
+    color: #34d399;
+}
+
+.audit-eta,
+.audit-stock-note,
+.audit-completed-at {
+    margin-top: 3px;
+    color: #64748b;
+    font-size: 0.66rem;
+    white-space: nowrap;
+}
+
+.audit-stock-note {
+    color: #6ee7b7;
+}
+
+.audit-completed-at {
+    color: #94a3b8;
+}
+
+.audit-remove-btn {
+    border-color: rgba(248, 113, 113, 0.28);
+    color: #fca5a5;
+}
+
+.audit-empty-state {
+    padding: 30px !important;
+    color: #94a3b8;
+    text-align: center;
+}
+
+@media (max-width: 1500px) {
+    .global-nav-bar { gap: 3px; }
+    .nav-link-btn { padding: 6px 9px; font-size: 0.75rem; }
+}
+
+@media (max-width: 820px) {
+    .forecast-modal-layout { grid-template-columns: 1fr; }
+    .nav-modal-content.is-wide { width: 94vw; }
+    .nav-modal-content.is-audit-wide {
+        width: 96vw;
+        padding: 18px;
+    }
+    .audit-toolbar {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}

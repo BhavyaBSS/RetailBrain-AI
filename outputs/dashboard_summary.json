@@ -1,0 +1,14 @@
+{
+  "total_stores": 100,
+  "total_products": 35,
+  "total_historical_revenue": 1578429018.9000008,
+  "total_historical_profit": 346744092.8999997,
+  "combos_needing_reorder": 1394,
+  "combos_overstocked": 228,
+  "stock_transfer_recommendations": 303,
+  "products_with_rising_prices": 0,
+  "total_expected_profit_uplift_next_horizon": 2564165.54,
+  "forecast_model_wape_overall": 0.09857022959426737,
+  "forecast_model_wape_festival_days": 0.11350083693800905,
+  "forecast_model_wape_normal_days": 0.09762784608047687
+}

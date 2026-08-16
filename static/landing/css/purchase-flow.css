@@ -1,0 +1,208 @@
+/* ==========================================================================
+   RetailBrain AI — Purchase Order Supplier Comparison Table (Phase 10)
+   ========================================================================== */
+
+.supplier-algorithm-panel {
+    display: grid;
+    grid-template-columns: minmax(320px, 1.15fr) minmax(260px, 0.85fr);
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.supplier-graph,
+.dijkstra-calculation {
+    min-height: 180px;
+    padding: 16px;
+    border: 1px solid rgba(0, 242, 254, 0.18);
+    border-radius: 14px;
+    background: rgba(7, 9, 14, 0.72);
+}
+
+.supplier-graph {
+    display: grid;
+    grid-template-columns: 112px 1fr;
+    align-items: center;
+    gap: 14px;
+}
+
+.graph-store-node,
+.graph-supplier-node {
+    border: 1px solid rgba(0, 242, 254, 0.42);
+    border-radius: 10px;
+    padding: 10px;
+    color: #e8fbff;
+    background: rgba(0, 242, 254, 0.1);
+    font-size: 0.76rem;
+    font-weight: 700;
+    text-align: center;
+}
+
+.graph-edge-column {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.graph-path {
+    display: grid;
+    grid-template-columns: minmax(28px, 1fr) auto minmax(150px, 2fr);
+    align-items: center;
+    gap: 7px;
+}
+
+.graph-edge-line {
+    height: 1px;
+    border-top: 1px dashed rgba(148, 163, 184, 0.5);
+}
+
+.graph-edge-cost {
+    color: #94a3b8;
+    font: 700 0.7rem 'JetBrains Mono', monospace;
+}
+
+.graph-supplier-node {
+    padding: 7px 9px;
+    border-color: rgba(255, 255, 255, 0.12);
+    background: rgba(15, 23, 42, 0.8);
+    text-align: left;
+}
+
+.graph-supplier-node small {
+    display: block;
+    margin-top: 2px;
+    color: #94a3b8;
+    font-weight: 500;
+}
+
+.graph-path.is-winner .graph-edge-line {
+    border-color: #34d399;
+    box-shadow: 0 0 8px rgba(52, 211, 153, 0.7);
+}
+
+.graph-path.is-winner .graph-supplier-node {
+    border-color: #34d399;
+    background: rgba(16, 185, 129, 0.15);
+}
+
+.algorithm-heading {
+    color: #ffffff;
+    font-family: var(--font-heading, 'Outfit', sans-serif);
+    font-weight: 700;
+}
+
+.algorithm-formula {
+    margin-top: 5px;
+    color: #7dd3fc;
+    font-size: 0.72rem;
+    line-height: 1.4;
+}
+
+.dijkstra-steps {
+    margin: 12px 0 0;
+    padding-left: 20px;
+    color: #cbd5e1;
+    font-size: 0.75rem;
+    line-height: 1.65;
+}
+
+.algorithm-winner,
+.supplier-profit.is-positive {
+    color: #34d399;
+}
+
+.supplier-profit.is-negative {
+    color: #fb7185;
+}
+
+@media (max-width: 820px) {
+    .supplier-algorithm-panel {
+        grid-template-columns: 1fr;
+    }
+}
+
+.supplier-table-container {
+    width: 100%;
+    overflow-x: auto;
+    background: rgba(7, 9, 14, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    margin-bottom: 20px;
+}
+
+.supplier-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 0.86rem;
+}
+
+.supplier-table th {
+    background: rgba(15, 23, 42, 0.9);
+    color: #94a3b8;
+    font-family: var(--font-heading, 'Outfit', sans-serif);
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+    padding: 14px 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.supplier-table td {
+    padding: 14px 16px;
+    color: #e2e8f0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.supplier-table tr {
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.supplier-table tr:hover {
+    background: rgba(0, 242, 254, 0.06);
+}
+
+.supplier-table tr.is-selected {
+    background: rgba(0, 242, 254, 0.14) !important;
+}
+
+.supplier-table tr.is-recommended {
+    border-left: 4px solid #10b981;
+}
+
+.table-rec-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: rgba(16, 185, 129, 0.2);
+    border: 1px solid rgba(16, 185, 129, 0.5);
+    color: #34d399;
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 12px;
+    margin-left: 8px;
+}
+
+.rating-stars {
+    color: #f59e0b;
+    font-weight: 700;
+}
+
+.supplier-price {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    color: #ffffff;
+}
+
+.po-quantity-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 14px 20px;
+    gap: 16px;
+}

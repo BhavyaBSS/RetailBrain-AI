@@ -1,0 +1,34 @@
+# Python virtual environment
+.venv/
+venv/
+env/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# macOS
+.DS_Store
+
+# Environment/secrets
+.env
+.env.*
+!.env.example
+
+# Temporary files
+scratch/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Large datasets - handled separately
+data/corrected_sales_dataset.csv
+
+# Git
+.git/
+
+# Python build files
+*.egg-info/
+dist/
+build/
