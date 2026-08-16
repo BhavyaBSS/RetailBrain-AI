@@ -4,6 +4,7 @@
 (function () {
     const hiddenAuditStorageKey = "retailbrain-hidden-completed-audits";
     let auditCountdownTimer = null;
+    let auditRefreshTimer = null;
     let currentAuditHistory = [];
     let showRemovedAuditRows = false;
 
@@ -141,53 +142,126 @@
             });
     }
 
+    function loadAuditHistory({ render = true } = {}) {
+    return Promise.all([
+        fetch("/api/action/dispatch-history").then((res) =>
+            requireSuccessfulResponse(res, "Audit history")
+        ),
+        fetch("/api/products")
+            .then((res) => requireSuccessfulResponse(res, "Product catalogue"))
+            .catch(() => []),
+    ]).then(([data, products]) => {
+        const productNames = new Map(
+            (Array.isArray(products) ? products : []).map((product) => [
+                String(product.Product_ID),
+                product.Product_Name
+            ])
+        );
+
+        const enrichProductName = (row) => ({
+            ...row,
+            product_name:
+                row.product_name ||
+                productNames.get(String(row.product_id)) ||
+                "Product name unavailable",
+        });
+
+        const purchaseOrders = Array.isArray(data && data.purchase_orders)
+            ? data.purchase_orders.map((row) => ({
+                ...enrichProductName(row),
+                auditType: "PURCHASE ORDER"
+            }))
+            : [];
+
+        const stockTransfers = Array.isArray(data && data.stock_transfers)
+            ? data.stock_transfers.map((row) => ({
+                ...enrichProductName(row),
+                auditType: "STOCK TRANSFER"
+            }))
+            : [];
+
+        const history = [...purchaseOrders, ...stockTransfers]
+            .sort((a, b) =>
+                String(b.timestamp || "").localeCompare(
+                    String(a.timestamp || "")
+                )
+            );
+
+        currentAuditHistory = history;
+
+        if (render) {
+            renderAuditHistory();
+        }
+
+        return history;
+    });
+}
     function openHistoryModal() {
-        document.querySelector(".nav-modal-content").classList.add("is-wide");
-        document.querySelector(".nav-modal-content").classList.add("is-audit-wide");
-        document.getElementById("nav-modal-title").textContent = "Dispatch & Purchase Order Audit Log";
-        const body = document.getElementById("nav-modal-body");
-        body.innerHTML = '<div style="color: var(--text-muted); font-style: italic; padding: 20px;">Fetching dispatch history...</div>';
+    stopAuditCountdown();
 
-        const backdrop = document.getElementById("nav-modal-backdrop");
-        backdrop.classList.add("is-open");
-
-        Promise.all([
-            fetch("/api/action/dispatch-history").then((res) => requireSuccessfulResponse(res, "Audit history")),
-            fetch("/api/products")
-                .then((res) => requireSuccessfulResponse(res, "Product catalogue"))
-                .catch(() => []),
-        ])
-            .then(([data, products]) => {
-                const productNames = new Map(
-                    (Array.isArray(products) ? products : []).map((product) => [String(product.Product_ID), product.Product_Name])
-                );
-                const enrichProductName = (row) => ({
-                    ...row,
-                    product_name: row.product_name || productNames.get(String(row.product_id)) || "Product name unavailable",
-                });
-                const purchaseOrders = Array.isArray(data && data.purchase_orders)
-                    ? data.purchase_orders.map((row) => ({ ...enrichProductName(row), auditType: "PURCHASE ORDER" }))
-                    : [];
-                const stockTransfers = Array.isArray(data && data.stock_transfers)
-                    ? data.stock_transfers.map((row) => ({ ...enrichProductName(row), auditType: "STOCK TRANSFER" }))
-                    : [];
-                const history = [...purchaseOrders, ...stockTransfers]
-                    .sort((a, b) => String(b.timestamp || "").localeCompare(String(a.timestamp || "")));
-
-                if (history.length === 0) {
-                    body.innerHTML = '<div style="color: #94a3b8; text-align: center; padding: 30px;">No approved dispatches or purchase orders logged yet.</div>';
-                    return;
-                }
-                currentAuditHistory = history;
-                showRemovedAuditRows = false;
-                renderAuditHistory();
-                if (auditCountdownTimer) clearInterval(auditCountdownTimer);
-                auditCountdownTimer = setInterval(refreshAuditCountdowns, 1000);
-            })
-            .catch((err) => {
-                body.innerHTML = '<div style="color: #ff4757; padding: 20px;">Failed to load audit history log.</div>';
-            });
+    if (auditRefreshTimer) {
+        clearInterval(auditRefreshTimer);
+        auditRefreshTimer = null;
     }
+
+    document.querySelector(".nav-modal-content").classList.add("is-wide");
+    document.querySelector(".nav-modal-content").classList.add("is-audit-wide");
+
+    document.getElementById("nav-modal-title").textContent =
+        "Dispatch & Purchase Order Audit Log";
+
+    const body = document.getElementById("nav-modal-body");
+
+    body.innerHTML =
+        '<div style="color: var(--text-muted); font-style: italic; padding: 20px;">Fetching dispatch history...</div>';
+
+    const backdrop = document.getElementById("nav-modal-backdrop");
+    backdrop.classList.add("is-open");
+
+    loadAuditHistory()
+        .then((history) => {
+            if (history.length === 0) {
+                body.innerHTML =
+                    '<div style="color: #94a3b8; text-align: center; padding: 30px;">No approved dispatches or purchase orders logged yet.</div>';
+                return;
+            }
+
+            showRemovedAuditRows = false;
+            renderAuditHistory();
+
+            auditCountdownTimer = setInterval(
+                refreshAuditCountdowns,
+                1000
+            );
+
+            // Refresh backend transaction list every 5 seconds.
+            auditRefreshTimer = setInterval(() => {
+    const previousIds = currentAuditHistory
+        .map(getAuditRowId)
+        .join("|");
+
+    loadAuditHistory({ render: false })
+        .then((history) => {
+            const newIds = history
+                .map(getAuditRowId)
+                .join("|");
+
+            if (newIds !== previousIds) {
+                renderAuditHistory();
+            }
+        })
+        .catch((error) => {
+            console.error("Audit refresh error:", error);
+        });
+}, 5000);
+        })
+        .catch((err) => {
+            console.error("Audit history error:", err);
+
+            body.innerHTML =
+                '<div style="color: #ff4757; padding: 20px;">Failed to load audit history log.</div>';
+        });
+}
 
     function parseAuditTimestamp(value) {
         const normalized = String(value || "").trim().replace(" ", "T");
@@ -654,11 +728,16 @@
     }
 
     function stopAuditCountdown() {
-        if (auditCountdownTimer) {
-            clearInterval(auditCountdownTimer);
-            auditCountdownTimer = null;
-        }
+    if (auditCountdownTimer) {
+        clearInterval(auditCountdownTimer);
+        auditCountdownTimer = null;
     }
+
+    if (auditRefreshTimer) {
+        clearInterval(auditRefreshTimer);
+        auditRefreshTimer = null;
+    }
+}
 
     function hideNavModal() {
         stopAuditCountdown();
