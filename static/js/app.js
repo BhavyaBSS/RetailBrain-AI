@@ -1035,24 +1035,37 @@ document.addEventListener('DOMContentLoaded', () => {
        LIGHTGBM PIPELINE EXECUTION & LOG STREAMER
        ========================================================================== */
     function initActionButtons() {
-        const btnRun = document.getElementById('btn-run-pipeline');
-        if (btnRun) {
-            btnRun.addEventListener('click', triggerPipelineExecution);
-        }
+    const btnRun = document.getElementById('btn-run-pipeline');
 
-        const btnRefreshLogs = document.getElementById('btn-refresh-logs');
-        if (btnRefreshLogs) {
-            btnRefreshLogs.addEventListener('click', fetchPipelineLogs);
-        }
-
-        const btnClearLogs = document.getElementById('btn-clear-logs');
-        if (btnClearLogs) {
-            btnClearLogs.addEventListener('click', () => {
-                const logOut = document.getElementById('console-log-output');
-                if (logOut) logOut.textContent = 'Cleared view.';
-            });
-        }
+    if (btnRun) {
+        btnRun.addEventListener('click', triggerPipelineExecution);
     }
+
+    const btnRefreshLogs = document.getElementById('btn-refresh-logs');
+
+    if (btnRefreshLogs) {
+        btnRefreshLogs.addEventListener('click', fetchPipelineLogs);
+    }
+
+    const btnClearLogs = document.getElementById('btn-clear-logs');
+
+    if (btnClearLogs) {
+        btnClearLogs.addEventListener('click', () => {
+            const logOut = document.getElementById('console-log-output');
+
+            if (logOut) {
+                logOut.textContent = 'Cleared view.';
+            }
+        });
+    }
+
+    // Audit Log refresh
+    const btnRefreshHistory = document.getElementById('btn-refresh-history');
+
+    if (btnRefreshHistory) {
+        btnRefreshHistory.addEventListener('click', fetchDispatchHistory);
+    }
+}
 
     async function triggerPipelineExecution() {
         try {

@@ -875,6 +875,29 @@ input[type="range"] {
     display: flex;
     flex-direction: column;
     gap: 10px;
+
+    /* Audit Log scrolling */
+    max-height: 520px;
+    overflow-y: auto;
+    padding-right: 8px;
+}
+
+/* Audit Log scrollbar */
+.history-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.history-list::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.history-list::-webkit-scrollbar-thumb {
+    background: #1e293b;
+    border-radius: 4px;
+}
+
+.history-list::-webkit-scrollbar-thumb:hover {
+    background: var(--color-cyan);
 }
 
 .history-item {
