@@ -100,7 +100,7 @@
     flex: 1 1 0;
     min-height: 0;
     height: 0;
-    overflow-y: auto !important;
+    overflow: hidden !important;
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
 }
@@ -311,9 +311,19 @@
 .audit-table-wrap {
     width: 100%;
     min-height: 0;
+
+    /* Give the Network Map Audit Log its own scroll area */
+    max-height: calc(100vh - 150px);
     overflow-x: auto;
-    overflow-y: visible;
+    overflow-y: auto;
+
     overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Keep the audit table usable when many transactions are present */
+.audit-table-wrap .audit-table {
+    min-width: 1080px;
 }
 
 .audit-table {
