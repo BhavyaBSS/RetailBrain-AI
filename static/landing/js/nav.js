@@ -279,6 +279,15 @@
         return Number.isNaN(date.getTime()) ? new Date() : date;
     }
 
+    function formatAuditTimestampDisplay(value) {
+        // Reuses the same timezone-safe parsing as the countdown logic,
+        // then reformats to a clean "YYYY-MM-DD HH:MM:SS" (IST) for display only.
+        const date = parseAuditTimestamp(value);
+        const datePart = date.toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" }); // YYYY-MM-DD
+        const timePart = date.toLocaleTimeString("en-GB", { timeZone: "Asia/Kolkata", hour12: false }); // HH:MM:SS
+        return `${datePart} ${timePart}`;
+    }
+
     function getAuditRowId(row) {
         return String(row.po_number || row.transfer_id || `${row.auditType}-${row.timestamp}-${row.product_id}`);
     }
@@ -403,7 +412,7 @@
                             const status = timing.completed ? "COMPLETED" : (row.status || "APPROVED");
                             return `
                                 <tr class="${timing.completed ? "audit-row-completed" : ""} ${isRemoved ? "audit-row-removed" : ""}">
-                                    <td>${escapeHtml(row.timestamp || "Just now")}</td>
+                                    <td>${escapeHtml(row.timestamp ? formatAuditTimestampDisplay(row.timestamp) : "Just now")}</td>
                                     <td><b>${escapeHtml(row.auditType)}</b></td>
                                     <td>${formatAuditDetails(row)}</td>
                                     <td>
@@ -511,7 +520,7 @@
 
         const preparedRows = rows.map((row, index) => {
             const timing = getAuditTiming(row, generatedAt);
-            const createdParts = String(row.timestamp || "Unknown").split(" ");
+            const createdParts = formatAuditTimestampDisplay(row.timestamp || "").split(" ");
             const completionParts = formatPdfDate(timing.completesAt).split(" ");
             const status = timing.completed ? "COMPLETED" : String(row.status || "APPROVED").replaceAll("_", " ");
             const movement = row.auditType === "PURCHASE ORDER"
