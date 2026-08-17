@@ -115,15 +115,30 @@ html, body {
 
 /* ---------- Responsive ---------- */
 @media (max-width: 860px) {
+    html, body {
+        height: auto;
+        min-height: 100%;
+        overflow-y: auto;
+        overflow-x: hidden;
+        -webkit-overflow-scrolling: touch;
+    }
+
     .landing-stage {
         grid-template-columns: 1fr;
-        grid-template-rows: 1fr 1fr;
+        grid-template-rows: auto auto;
+        height: auto;
+        min-height: 100vh;
         padding: 6vh 6vw;
-        gap: 2vh;
+        gap: 4vh;
         text-align: center;
     }
     .identity-panel { align-items: center; max-width: 100%; }
     .brand-subtitle { max-width: 100%; }
+
+    .globe-panel {
+        height: 320px;
+        min-height: 260px;
+    }
 }
 
 /* ---------- Reduced motion ---------- */
