@@ -27,11 +27,13 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 html, body {
-    height: 100%;
+    min-height: 100%;
     background: var(--bg-void);
     color: var(--text-primary);
     font-family: var(--font-body);
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 /* ---------- Starfield background ---------- */
@@ -49,7 +51,7 @@ html, body {
     display: grid;
     grid-template-columns: 1fr 1fr;
     align-items: center;
-    height: 100vh;
+    min-height: 100vh;
     width: 100%;
     padding: 0 6vw;
     gap: 4vw;
@@ -101,6 +103,7 @@ html, body {
 .globe-panel {
     position: relative;
     height: 100%;
+    min-height: 350px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -115,30 +118,16 @@ html, body {
 
 /* ---------- Responsive ---------- */
 @media (max-width: 860px) {
-    html, body {
-        height: auto;
-        min-height: 100%;
-        overflow-y: auto;
-        overflow-x: hidden;
-        -webkit-overflow-scrolling: touch;
-    }
-
     .landing-stage {
         grid-template-columns: 1fr;
         grid-template-rows: auto auto;
-        height: auto;
-        min-height: 100vh;
         padding: 6vh 6vw;
         gap: 4vh;
         text-align: center;
+        height: auto;
     }
     .identity-panel { align-items: center; max-width: 100%; }
     .brand-subtitle { max-width: 100%; }
-
-    .globe-panel {
-        height: 320px;
-        min-height: 260px;
-    }
 }
 
 /* ---------- Reduced motion ---------- */
