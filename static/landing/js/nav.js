@@ -17,7 +17,7 @@
             <nav class="global-nav-bar">
                 <a href="/" class="nav-link-btn" id="nav-globe">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-                    Globe
+                    Home
                 </a>
                 <a href="/india-map" class="nav-link-btn active" id="nav-map">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 6v14l7-4 8 4 7-4V2l-7 4-8-4-7 4z"/><path d="M8 2v14M16 6v14"/></svg>
