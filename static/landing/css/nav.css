@@ -57,7 +57,7 @@
     background: rgba(5, 7, 13, 0.85);
     backdrop-filter: blur(10px);
     display: flex;
-    align-items: safe center;   /* was: flex-start */
+    align-items: safe center;
     justify-content: center;
     padding: 16px;
     box-sizing: border-box;
@@ -99,10 +99,9 @@
 .nav-modal-content.is-audit-wide #nav-modal-body {
     flex: 1 1 0;
     min-height: 0;
-    height: 0;
+    display: flex;
+    flex-direction: column;
     overflow: hidden !important;
-    overflow-x: hidden;
-    -webkit-overflow-scrolling: touch;
 }
 
 .kpi-cards-grid {
@@ -276,6 +275,7 @@
     margin-bottom: 10px;
     color: #94a3b8;
     font-size: 0.76rem;
+    flex-shrink: 0;
 }
 
 .audit-toolbar-actions {
@@ -294,6 +294,7 @@
     padding: 7px 10px;
     font: 700 0.7rem var(--font-body, 'Inter', sans-serif);
     cursor: pointer;
+    white-space: nowrap;
 }
 
 .audit-toolbar-btn:hover,
@@ -310,30 +311,30 @@
 
 .audit-table-wrap {
     width: 100%;
+    flex: 1 1 auto;
     min-height: 0;
-
-    /* Give the Network Map Audit Log its own scroll area */
-    max-height: calc(100vh - 150px);
-    overflow-x: auto;
-    overflow-y: auto;
-
+    overflow-x: auto !important;
+    overflow-y: auto !important;
     overscroll-behavior: contain;
     -webkit-overflow-scrolling: touch;
 }
 
-/* Keep the audit table usable when many transactions are present */
-.audit-table-wrap .audit-table {
-    min-width: 1080px;
-}
-
+/* Force horizontal table layout and keep items on 1 single line */
 .audit-table {
     width: 100%;
-    min-width: 1080px;
+    min-width: 1050px;
+    border-collapse: collapse;
 }
 
 .audit-table th,
 .audit-table td {
     vertical-align: middle;
+    white-space: nowrap;
+    padding: 10px 12px;
+}
+
+.audit-details-cell {
+    white-space: nowrap !important;
 }
 
 .audit-table thead th {
@@ -399,7 +400,7 @@
     .nav-modal-content.is-wide { width: 94vw; }
     .nav-modal-content.is-audit-wide {
         width: 96vw;
-        padding: 18px;
+        padding: 16px;
     }
     .audit-toolbar {
         align-items: flex-start;
@@ -416,52 +417,48 @@
     }
     .global-nav-bar::-webkit-scrollbar { display: none; }
     .nav-link-btn { padding: 6px 10px; font-size: 0.72rem; }
-    .nav-modal-content { padding: 18px 16px; width: 94vw; }
+    .nav-modal-content { padding: 16px 12px; width: 96vw; }
     .kpi-cards-grid { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
 
-    /* Audit Log: switch from a wide scrolling table to a stacked card list.
-       Timestamp / Type / Details stay up top; Time remaining, Status and
-       Actions (previously off-screen) are shown as labeled rows underneath. */
-    .audit-table-wrap { overflow-x: hidden; max-height: none; }
-    .audit-table { min-width: 0; width: 100%; }
-    .audit-table thead { display: none; }
-    .audit-table, .audit-table tbody, .audit-table tr, .audit-table td {
+    /* Enable true multi-axis scrolling for Mobile */
+    .nav-modal-content.is-audit-wide {
+        height: 92vh;
+        max-height: 92vh;
+    }
+    
+    .audit-table-wrap {
         display: block;
         width: 100%;
-    }
-    .audit-table tr {
-        margin-bottom: 12px;
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 12px;
-        overflow: hidden;
-        background: rgba(15, 23, 42, 0.5);
-    }
-    .audit-table td {
-        padding: 8px 14px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    }
-    .audit-table td:last-child { border-bottom: none; }
-    .audit-table td[data-label]::before {
-        content: attr(data-label);
-        display: block;
-        font-size: 0.66rem;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        color: #64748b;
-        margin-bottom: 3px;
-    }
-    .audit-table td:empty {
-        display: none;
-    }
-    .audit-table td[data-label="Timestamp"],
-    .audit-table td[data-label="Type"] {
-        display: inline-block;
-        width: auto;
-        padding-right: 8px;
+        max-height: calc(92vh - 120px);
+        overflow-x: auto !important;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch;
     }
 
-    .nav-modal-content.is-audit-wide #nav-modal-body {
-        overflow-y: auto !important;
+    .audit-table {
+        display: table !important;
+        min-width: 950px !important;
+        width: max-content !important;
+    }
+
+    .audit-table thead {
+        display: table-header-group !important;
+    }
+
+    .audit-table tbody {
+        display: table-row-group !important;
+    }
+
+    .audit-table tr {
+        display: table-row !important;
+        background: transparent;
+        border: none;
+    }
+
+    .audit-table th,
+    .audit-table td {
+        display: table-cell !important;
+        white-space: nowrap !important;
+        padding: 10px 8px;
     }
 }

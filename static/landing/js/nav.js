@@ -143,132 +143,130 @@
     }
 
     function loadAuditHistory({ render = true } = {}) {
-    return Promise.all([
-        fetch("/api/action/dispatch-history").then((res) =>
-            requireSuccessfulResponse(res, "Audit history")
-        ),
-        fetch("/api/products")
-            .then((res) => requireSuccessfulResponse(res, "Product catalogue"))
-            .catch(() => []),
-    ]).then(([data, products]) => {
-        const productNames = new Map(
-            (Array.isArray(products) ? products : []).map((product) => [
-                String(product.Product_ID),
-                product.Product_Name
-            ])
-        );
-
-        const enrichProductName = (row) => ({
-            ...row,
-            product_name:
-                row.product_name ||
-                productNames.get(String(row.product_id)) ||
-                "Product name unavailable",
-        });
-
-        const purchaseOrders = Array.isArray(data && data.purchase_orders)
-            ? data.purchase_orders.map((row) => ({
-                ...enrichProductName(row),
-                auditType: "PURCHASE ORDER"
-            }))
-            : [];
-
-        const stockTransfers = Array.isArray(data && data.stock_transfers)
-            ? data.stock_transfers.map((row) => ({
-                ...enrichProductName(row),
-                auditType: "STOCK TRANSFER"
-            }))
-            : [];
-
-        const history = [...purchaseOrders, ...stockTransfers]
-            .sort((a, b) =>
-                String(b.timestamp || "").localeCompare(
-                    String(a.timestamp || "")
-                )
+        return Promise.all([
+            fetch("/api/action/dispatch-history").then((res) =>
+                requireSuccessfulResponse(res, "Audit history")
+            ),
+            fetch("/api/products")
+                .then((res) => requireSuccessfulResponse(res, "Product catalogue"))
+                .catch(() => []),
+        ]).then(([data, products]) => {
+            const productNames = new Map(
+                (Array.isArray(products) ? products : []).map((product) => [
+                    String(product.Product_ID),
+                    product.Product_Name
+                ])
             );
 
-        currentAuditHistory = history;
+            const enrichProductName = (row) => ({
+                ...row,
+                product_name:
+                    row.product_name ||
+                    productNames.get(String(row.product_id)) ||
+                    "Product name unavailable",
+            });
 
-        if (render) {
-            renderAuditHistory();
-        }
+            const purchaseOrders = Array.isArray(data && data.purchase_orders)
+                ? data.purchase_orders.map((row) => ({
+                    ...enrichProductName(row),
+                    auditType: "PURCHASE ORDER"
+                }))
+                : [];
 
-        return history;
-    });
-}
-    function openHistoryModal() {
-    stopAuditCountdown();
+            const stockTransfers = Array.isArray(data && data.stock_transfers)
+                ? data.stock_transfers.map((row) => ({
+                    ...enrichProductName(row),
+                    auditType: "STOCK TRANSFER"
+                }))
+                : [];
 
-    if (auditRefreshTimer) {
-        clearInterval(auditRefreshTimer);
-        auditRefreshTimer = null;
-    }
+            const history = [...purchaseOrders, ...stockTransfers]
+                .sort((a, b) =>
+                    String(b.timestamp || "").localeCompare(
+                        String(a.timestamp || "")
+                    )
+                );
 
-    document.querySelector(".nav-modal-content").classList.add("is-wide");
-    document.querySelector(".nav-modal-content").classList.add("is-audit-wide");
+            currentAuditHistory = history;
 
-    document.getElementById("nav-modal-title").textContent =
-        "Dispatch & Purchase Order Audit Log";
-
-    const body = document.getElementById("nav-modal-body");
-
-    body.innerHTML =
-        '<div style="color: var(--text-muted); font-style: italic; padding: 20px;">Fetching dispatch history...</div>';
-
-    const backdrop = document.getElementById("nav-modal-backdrop");
-    backdrop.classList.add("is-open");
-
-    loadAuditHistory()
-        .then((history) => {
-            if (history.length === 0) {
-                body.innerHTML =
-                    '<div style="color: #94a3b8; text-align: center; padding: 30px;">No approved dispatches or purchase orders logged yet.</div>';
-                return;
-            }
-
-            showRemovedAuditRows = false;
-            renderAuditHistory();
-
-            auditCountdownTimer = setInterval(
-                refreshAuditCountdowns,
-                1000
-            );
-
-            // Refresh backend transaction list every 5 seconds.
-            auditRefreshTimer = setInterval(() => {
-    const previousIds = currentAuditHistory
-        .map(getAuditRowId)
-        .join("|");
-
-    loadAuditHistory({ render: false })
-        .then((history) => {
-            const newIds = history
-                .map(getAuditRowId)
-                .join("|");
-
-            if (newIds !== previousIds) {
+            if (render) {
                 renderAuditHistory();
             }
-        })
-        .catch((error) => {
-            console.error("Audit refresh error:", error);
-        });
-}, 5000);
-        })
-        .catch((err) => {
-            console.error("Audit history error:", err);
 
-            body.innerHTML =
-                '<div style="color: #ff4757; padding: 20px;">Failed to load audit history log.</div>';
+            return history;
         });
-}
+    }
+
+    function openHistoryModal() {
+        stopAuditCountdown();
+
+        if (auditRefreshTimer) {
+            clearInterval(auditRefreshTimer);
+            auditRefreshTimer = null;
+        }
+
+        document.querySelector(".nav-modal-content").classList.add("is-wide");
+        document.querySelector(".nav-modal-content").classList.add("is-audit-wide");
+
+        document.getElementById("nav-modal-title").textContent =
+            "Dispatch & Purchase Order Audit Log";
+
+        const body = document.getElementById("nav-modal-body");
+
+        body.innerHTML =
+            '<div style="color: var(--text-muted); font-style: italic; padding: 20px;">Fetching dispatch history...</div>';
+
+        const backdrop = document.getElementById("nav-modal-backdrop");
+        backdrop.classList.add("is-open");
+
+        loadAuditHistory()
+            .then((history) => {
+                if (history.length === 0) {
+                    body.innerHTML =
+                        '<div style="color: #94a3b8; text-align: center; padding: 30px;">No approved dispatches or purchase orders logged yet.</div>';
+                    return;
+                }
+
+                showRemovedAuditRows = false;
+                renderAuditHistory();
+
+                auditCountdownTimer = setInterval(
+                    refreshAuditCountdowns,
+                    1000
+                );
+
+                auditRefreshTimer = setInterval(() => {
+                    const previousIds = currentAuditHistory
+                        .map(getAuditRowId)
+                        .join("|");
+
+                    loadAuditHistory({ render: false })
+                        .then((history) => {
+                            const newIds = history
+                                .map(getAuditRowId)
+                                .join("|");
+
+                            if (newIds !== previousIds) {
+                                renderAuditHistory();
+                            }
+                        })
+                        .catch((error) => {
+                            console.error("Audit refresh error:", error);
+                        });
+                }, 5000);
+            })
+            .catch((err) => {
+                console.error("Audit history error:", err);
+
+                body.innerHTML =
+                    '<div style="color: #ff4757; padding: 20px;">Failed to load audit history log.</div>';
+            });
+    }
 
     function parseAuditTimestamp(value) {
         const raw = String(value || "").trim();
         if (!raw) return new Date();
 
-        // Backend timestamps without an explicit timezone are stored in IST.
-        // Explicit ISO timezone values are left untouched.
         let normalized = raw.replace(" ", "T");
 
         if (!/[zZ]|[+-]\d{2}:?\d{2}$/.test(normalized)) {
@@ -280,11 +278,9 @@
     }
 
     function formatAuditTimestampDisplay(value) {
-        // Reuses the same timezone-safe parsing as the countdown logic,
-        // then reformats to a clean "YYYY-MM-DD HH:MM:SS" (IST) for display only.
         const date = parseAuditTimestamp(value);
-        const datePart = date.toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" }); // YYYY-MM-DD
-        const timePart = date.toLocaleTimeString("en-GB", { timeZone: "Asia/Kolkata", hour12: false }); // HH:MM:SS
+        const datePart = date.toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" });
+        const timePart = date.toLocaleTimeString("en-GB", { timeZone: "Asia/Kolkata", hour12: false });
         return `${datePart} ${timePart}`;
     }
 
@@ -313,7 +309,6 @@
         const startedAt = parseAuditTimestamp(row.timestamp);
         let completesAt = null;
 
-        // Prefer the exact ETA calculated by the backend.
         if (row.eta_at) {
             const exactEta = new Date(String(row.eta_at));
 
@@ -322,7 +317,6 @@
             }
         }
 
-        // Fallback for older stock-transfer records.
         if (!completesAt && row.auditType === "STOCK TRANSFER") {
             const etaMatch = String(row.eta || "45 minutes")
                 .match(/([\d.]+)\s*(minute|hour|day)/i);
@@ -339,17 +333,11 @@
             completesAt = new Date(
                 startedAt.getTime() + amount * multiplier
             );
-        }
-
-        // Fallback for older purchase orders.
-        else if (!completesAt && row.estimated_delivery) {
+        } else if (!completesAt && row.estimated_delivery) {
             completesAt = new Date(
                 `${String(row.estimated_delivery).slice(0, 10)}T18:00:00+05:30`
             );
-        }
-
-        // Final fallback.
-        else if (!completesAt) {
+        } else if (!completesAt) {
             completesAt = new Date(
                 startedAt.getTime() + 2 * 86400000
             );
@@ -412,15 +400,15 @@
                             const status = timing.completed ? "COMPLETED" : (row.status || "APPROVED");
                             return `
                                 <tr class="${timing.completed ? "audit-row-completed" : ""} ${isRemoved ? "audit-row-removed" : ""}">
-                                    <td data-label="Timestamp">${escapeHtml(row.timestamp ? formatAuditTimestampDisplay(row.timestamp) : "Just now")}</td>
-                                    <td data-label="Type"><b>${escapeHtml(row.auditType)}</b></td>
-                                    <td data-label="Details">${formatAuditDetails(row)}</td>
-                                    <td data-label="Time remaining">
+                                    <td>${escapeHtml(row.timestamp ? formatAuditTimestampDisplay(row.timestamp) : "Just now")}</td>
+                                    <td><b>${escapeHtml(row.auditType)}</b></td>
+                                    <td class="audit-details-cell">${formatAuditDetails(row)}</td>
+                                    <td>
                                         <div class="audit-countdown ${timing.completed ? "is-complete" : ""}" data-completes-at="${timing.completesAt.getTime()}" data-audit-completed="${timing.completed ? "1" : "0"}">${timing.completed ? "Arrived" : formatCountdown(timing.remainingMs)}</div>
                                         <div class="audit-eta">ETA ${escapeHtml(timing.completesAt.toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" }))}</div>
                                     </td>
-                                    <td data-label="Status"><span class="risk-badge badge-OPTIMAL">${escapeHtml(status)}</span>${timing.completed ? `<div class="audit-stock-note">Stock updated</div><div class="audit-completed-at">Completed ${escapeHtml(timing.completesAt.toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "medium" }))}</div>` : ""}</td>
-                                    <td data-label="Actions">${timing.completed ? `<button class="audit-remove-btn" data-audit-action="${isRemoved ? "restore" : "remove"}" data-audit-id="${escapeHtml(rowId)}">${isRemoved ? "Restore" : "Remove"}</button>` : ""}</td>
+                                    <td><span class="risk-badge badge-OPTIMAL">${escapeHtml(status)}</span>${timing.completed ? `<div class="audit-stock-note">Stock updated</div><div class="audit-completed-at">Completed ${escapeHtml(timing.completesAt.toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "medium" }))}</div>` : ""}</td>
+                                    <td>${timing.completed ? `<button class="audit-remove-btn" data-audit-action="${isRemoved ? "restore" : "remove"}" data-audit-id="${escapeHtml(rowId)}">${isRemoved ? "Restore" : "Remove"}</button>` : ""}</td>
                                 </tr>
                             `;
                         }).join("") || '<tr><td colspan="6" class="audit-empty-state">No visible transactions. Use “Show removed” to restore completed entries.</td></tr>'}
@@ -653,7 +641,6 @@
             }
         });
 
-        // Rebuild once when an ETA is reached so status and Remove controls appear.
         if (transactionCompleted) renderAuditHistory();
     }
 
@@ -783,16 +770,16 @@
     }
 
     function stopAuditCountdown() {
-    if (auditCountdownTimer) {
-        clearInterval(auditCountdownTimer);
-        auditCountdownTimer = null;
-    }
+        if (auditCountdownTimer) {
+            clearInterval(auditCountdownTimer);
+            auditCountdownTimer = null;
+        }
 
-    if (auditRefreshTimer) {
-        clearInterval(auditRefreshTimer);
-        auditRefreshTimer = null;
+        if (auditRefreshTimer) {
+            clearInterval(auditRefreshTimer);
+            auditRefreshTimer = null;
+        }
     }
-}
 
     function hideNavModal() {
         stopAuditCountdown();
