@@ -113,7 +113,8 @@
     animate();
 
     // ---------------------------------------------------------------
-    // 3. Interaction — slows on hover, click continues into the app
+    // 3. Interaction — globe just slows on hover now (purely decorative).
+    //    Moving forward happens via the "Click Here" button instead.
     // ---------------------------------------------------------------
     panel.addEventListener("mouseenter", () => (hovering = true));
     panel.addEventListener("mouseleave", () => (hovering = false));
@@ -130,7 +131,10 @@
         }
     }
 
-    panel.addEventListener("click", enterCommandTower);
+    const startBtn = document.getElementById("start-btn");
+    if (startBtn) {
+        startBtn.addEventListener("click", enterCommandTower);
+    }
 
     // Exposed so Phase 3's cloud-transition.js can call in and take over
     window.RetailBrainLanding = { enterCommandTower };
