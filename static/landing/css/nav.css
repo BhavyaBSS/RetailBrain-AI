@@ -418,4 +418,46 @@
     .nav-link-btn { padding: 6px 10px; font-size: 0.72rem; }
     .nav-modal-content { padding: 18px 16px; width: 94vw; }
     .kpi-cards-grid { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
+
+    /* Audit Log: switch from a wide scrolling table to a stacked card list.
+       Timestamp / Type / Details stay up top; Time remaining, Status and
+       Actions (previously off-screen) are shown as labeled rows underneath. */
+    .audit-table-wrap { overflow-x: hidden; max-height: none; }
+    .audit-table { min-width: 0; width: 100%; }
+    .audit-table thead { display: none; }
+    .audit-table, .audit-table tbody, .audit-table tr, .audit-table td {
+        display: block;
+        width: 100%;
+    }
+    .audit-table tr {
+        margin-bottom: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        overflow: hidden;
+        background: rgba(15, 23, 42, 0.5);
+    }
+    .audit-table td {
+        padding: 8px 14px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .audit-table td:last-child { border-bottom: none; }
+    .audit-table td[data-label]::before {
+        content: attr(data-label);
+        display: block;
+        font-size: 0.66rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #64748b;
+        margin-bottom: 3px;
+    }
+    .audit-table td:empty {
+        display: none;
+    }
+    .audit-table td[data-label="Timestamp"],
+    .audit-table td[data-label="Type"] {
+        display: inline-block;
+        width: auto;
+        padding-right: 8px;
+    }
 }

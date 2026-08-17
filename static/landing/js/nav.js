@@ -412,15 +412,15 @@
                             const status = timing.completed ? "COMPLETED" : (row.status || "APPROVED");
                             return `
                                 <tr class="${timing.completed ? "audit-row-completed" : ""} ${isRemoved ? "audit-row-removed" : ""}">
-                                    <td>${escapeHtml(row.timestamp ? formatAuditTimestampDisplay(row.timestamp) : "Just now")}</td>
-                                    <td><b>${escapeHtml(row.auditType)}</b></td>
-                                    <td>${formatAuditDetails(row)}</td>
-                                    <td>
+                                    <td data-label="Timestamp">${escapeHtml(row.timestamp ? formatAuditTimestampDisplay(row.timestamp) : "Just now")}</td>
+                                    <td data-label="Type"><b>${escapeHtml(row.auditType)}</b></td>
+                                    <td data-label="Details">${formatAuditDetails(row)}</td>
+                                    <td data-label="Time remaining">
                                         <div class="audit-countdown ${timing.completed ? "is-complete" : ""}" data-completes-at="${timing.completesAt.getTime()}" data-audit-completed="${timing.completed ? "1" : "0"}">${timing.completed ? "Arrived" : formatCountdown(timing.remainingMs)}</div>
                                         <div class="audit-eta">ETA ${escapeHtml(timing.completesAt.toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" }))}</div>
                                     </td>
-                                    <td><span class="risk-badge badge-OPTIMAL">${escapeHtml(status)}</span>${timing.completed ? `<div class="audit-stock-note">Stock updated</div><div class="audit-completed-at">Completed ${escapeHtml(timing.completesAt.toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "medium" }))}</div>` : ""}</td>
-                                    <td>${timing.completed ? `<button class="audit-remove-btn" data-audit-action="${isRemoved ? "restore" : "remove"}" data-audit-id="${escapeHtml(rowId)}">${isRemoved ? "Restore" : "Remove"}</button>` : ""}</td>
+                                    <td data-label="Status"><span class="risk-badge badge-OPTIMAL">${escapeHtml(status)}</span>${timing.completed ? `<div class="audit-stock-note">Stock updated</div><div class="audit-completed-at">Completed ${escapeHtml(timing.completesAt.toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "medium" }))}</div>` : ""}</td>
+                                    <td data-label="Actions">${timing.completed ? `<button class="audit-remove-btn" data-audit-action="${isRemoved ? "restore" : "remove"}" data-audit-id="${escapeHtml(rowId)}">${isRemoved ? "Restore" : "Remove"}</button>` : ""}</td>
                                 </tr>
                             `;
                         }).join("") || '<tr><td colspan="6" class="audit-empty-state">No visible transactions. Use “Show removed” to restore completed entries.</td></tr>'}

@@ -207,16 +207,16 @@
 
                 return `
                     <tr class="${isRec ? 'is-recommended' : ''} ${isSel ? 'is-selected' : ''}" data-sup-id="${s.Supplier_ID}">
-                        <td>
+                        <td data-label="Supplier Name">
                             <b>${s.Supplier_Name}</b>
                             ${isRec ? '<span class="table-rec-badge">&#9733; Recommended</span>' : ''}
                         </td>
-                        <td>${Number.isFinite(Number(s.distance)) ? `${s.distance} km` : "Unknown"}</td>
-                        <td class="supplier-price">${formatMoney(s.Supplier_Price)}</td>
-                        <td>${formatMoney(s.freightPerUnit)}</td>
-                        <td>${formatMoney(s.landedUnitCost)}</td>
-                        <td class="supplier-profit ${s.profitPerUnit >= 0 ? "is-positive" : "is-negative"}">${formatMoney(s.profitPerUnit)}</td>
-                        <td>${formatMoney(s.graphCost)}</td>
+                        <td data-label="Distance">${Number.isFinite(Number(s.distance)) ? `${s.distance} km` : "Unknown"}</td>
+                        <td data-label="Base/Unit" class="supplier-price">${formatMoney(s.Supplier_Price)}</td>
+                        <td data-label="Freight/Unit">${formatMoney(s.freightPerUnit)}</td>
+                        <td data-label="Landed/Unit">${formatMoney(s.landedUnitCost)}</td>
+                        <td data-label="Profit/Unit" class="supplier-profit ${s.profitPerUnit >= 0 ? "is-positive" : "is-negative"}">${formatMoney(s.profitPerUnit)}</td>
+                        <td data-label="Graph Cost">${formatMoney(s.graphCost)}</td>
                     </tr>
                 `;
             })

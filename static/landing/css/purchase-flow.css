@@ -206,3 +206,64 @@
     padding: 14px 20px;
     gap: 16px;
 }
+
+/* ---------- Responsive: phones ---------- */
+@media (max-width: 480px) {
+    /* Let the purchase modal shrink to the actual viewport instead of a 380px floor */
+    #purchase-modal {
+        width: min(96vw, 920px);
+    }
+
+    .supplier-graph {
+        grid-template-columns: 1fr;
+    }
+
+    .graph-store-node {
+        margin-bottom: 6px;
+    }
+
+    .graph-path {
+        grid-template-columns: 1fr;
+        gap: 4px;
+        padding: 8px 0;
+    }
+
+    .graph-edge-line { display: none; }
+
+    .graph-supplier-node {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    /* Supplier comparison table -> stacked cards, same pattern as the audit log */
+    .supplier-table-container { overflow-x: hidden; }
+    .supplier-table { min-width: 0; width: 100%; }
+    .supplier-table thead { display: none; }
+    .supplier-table, .supplier-table tbody, .supplier-table tr, .supplier-table td {
+        display: block;
+        width: 100%;
+    }
+    .supplier-table tr {
+        margin-bottom: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        overflow: hidden;
+        background: rgba(15, 23, 42, 0.4);
+    }
+    .supplier-table tr.is-recommended { border-left: 1px solid rgba(16, 185, 129, 0.5); }
+    .supplier-table td {
+        padding: 8px 14px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .supplier-table td:last-child { border-bottom: none; }
+    .supplier-table td[data-label]::before {
+        content: attr(data-label);
+        display: block;
+        font-size: 0.66rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #64748b;
+        margin-bottom: 3px;
+    }
+}
