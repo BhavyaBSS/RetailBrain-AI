@@ -10,6 +10,12 @@ import subprocess
 import time
 import random
 import io
+
+from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
+
+IST = ZoneInfo("Asia/Kolkata")
+
 from typing import Dict, Any, List, Optional
 import pandas as pd
 import numpy as np
@@ -20,6 +26,8 @@ from fastapi.responses import FileResponse, PlainTextResponse
 
 from src import config as cfg
 from src import data_loader as dl
+
+
 
 # Set up logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
@@ -661,16 +669,19 @@ def approve_purchase_order(
     Approves a Purchase Order, writes to history CSV, and updates the local inventory dataset.
     """
     po_number = f"PO-BLK-{random.randint(100000, 999999)}"
+    transaction_time = datetime.now(IST)
     dispatch_entry = {
         "po_number": po_number,
-        "timestamp": time.strftime("%Y-%m-%d %H:%M:%S"),
+        "timestamp": transaction_time.strftime("%Y-%m-%d %H:%M:%S"),
         "store_id": store_id,
         "product_id": product_id,
         "supplier_name": supplier_name,
         "order_qty": order_qty,
         "total_cost": total_cost,
         "status": "DISPATCHED_TO_SUPPLIER",
-        "estimated_delivery": time.strftime("%Y-%m-%d", time.localtime(time.time() + (2 * 86400)))
+        "estimated_delivery": (
+            transaction_time + timedelta(days=2)
+        ).strftime("%Y-%m-%d")
     }
     
     # Persist action to CSV log
@@ -699,16 +710,19 @@ def approve_stock_transfer(
     Approves an inter-store stock transfer, writes to history CSV, and adjusts the local inventory dataset.
     """
     transfer_id = f"TRK-{city[:3].upper()}-{random.randint(1000, 9999)}"
+    transaction_time = datetime.now(IST)
+    eta_time = transaction_time + timedelta(minutes=45)
     transfer_entry = {
         "transfer_id": transfer_id,
-        "timestamp": time.strftime("%Y-%m-%d %H:%M:%S"),
+        "timestamp": transaction_time.strftime("%Y-%m-%d %H:%M:%S"),
         "from_store": from_store,
         "to_store": to_store,
         "product_id": product_id,
         "transfer_qty": transfer_qty,
         "city": city,
         "status": "IN_TRANSIT",
-        "eta": "45 minutes"
+        "eta": "45 minutes",
+        "eta_at": eta_time.strftime("%Y-%m-%d %H:%M:%S")
     }
     
     # Persist action to CSV log
@@ -798,7 +812,7 @@ def ingest_new_data(
         if auto_trigger_retrain and not pipeline_state["is_running"]:
             os.makedirs(cfg.OUTPUT_DIR, exist_ok=True)
             with open(pipeline_state["log_file"], "w", encoding="utf-8") as f:
-                f.write(f"--- Pipeline Execution Initialized via Data Ingestion API at {time.strftime('%Y-%m-%d %H:%M:%S')} ---\n")
+                f.write(f"--- Pipeline Execution Initialized via Data Ingestion API at {datetime.now(IST).strftime('%Y-%m-%d %H:%M:%S')} ---\n")
             background_tasks.add_task(run_pipeline_worker)
             retrain_status = "Pipeline retrain worker triggered in background!"
             
@@ -828,7 +842,7 @@ def trigger_pipeline(background_tasks: BackgroundTasks):
     
     os.makedirs(cfg.OUTPUT_DIR, exist_ok=True)
     with open(pipeline_state["log_file"], "w", encoding="utf-8") as f:
-        f.write(f"--- Pipeline Execution Initialized via Web API at {time.strftime('%Y-%m-%d %H:%M:%S')} ---\n")
+        f.write(f"--- Pipeline Execution Initialized via Web API at {datetime.now(IST).strftime('%Y-%m-%d %H:%M:%S')} ---\n")
     
     background_tasks.add_task(run_pipeline_worker)
     return {

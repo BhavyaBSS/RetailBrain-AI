@@ -264,7 +264,17 @@
 }
 
     function parseAuditTimestamp(value) {
-        const normalized = String(value || "").trim().replace(" ", "T");
+        const raw = String(value || "").trim();
+        if (!raw) return new Date();
+
+        // Backend timestamps without an explicit timezone are stored in IST.
+        // Explicit ISO timezone values are left untouched.
+        let normalized = raw.replace(" ", "T");
+
+        if (!/[zZ]|[+-]\d{2}:?\d{2}$/.test(normalized)) {
+            normalized += "+05:30";
+        }
+
         const date = new Date(normalized);
         return Number.isNaN(date.getTime()) ? new Date() : date;
     }
@@ -292,22 +302,58 @@
 
     function getAuditTiming(row, now = new Date()) {
         const startedAt = parseAuditTimestamp(row.timestamp);
-        let completesAt;
+        let completesAt = null;
 
-        if (row.auditType === "STOCK TRANSFER") {
-            const etaMatch = String(row.eta || "45 minutes").match(/([\d.]+)\s*(minute|hour|day)/i);
+        // Prefer the exact ETA calculated by the backend.
+        if (row.eta_at) {
+            const exactEta = new Date(String(row.eta_at));
+
+            if (!Number.isNaN(exactEta.getTime())) {
+                completesAt = exactEta;
+            }
+        }
+
+        // Fallback for older stock-transfer records.
+        if (!completesAt && row.auditType === "STOCK TRANSFER") {
+            const etaMatch = String(row.eta || "45 minutes")
+                .match(/([\d.]+)\s*(minute|hour|day)/i);
+
             const amount = etaMatch ? Number(etaMatch[1]) : 45;
             const unit = etaMatch ? etaMatch[2].toLowerCase() : "minute";
-            const multiplier = unit.startsWith("day") ? 86400000 : unit.startsWith("hour") ? 3600000 : 60000;
-            completesAt = new Date(startedAt.getTime() + amount * multiplier);
-        } else if (row.estimated_delivery) {
-            completesAt = new Date(`${String(row.estimated_delivery).slice(0, 10)}T18:00:00`);
-        } else {
-            completesAt = new Date(startedAt.getTime() + 2 * 86400000);
+
+            const multiplier = unit.startsWith("day")
+                ? 86400000
+                : unit.startsWith("hour")
+                    ? 3600000
+                    : 60000;
+
+            completesAt = new Date(
+                startedAt.getTime() + amount * multiplier
+            );
+        }
+
+        // Fallback for older purchase orders.
+        else if (!completesAt && row.estimated_delivery) {
+            completesAt = new Date(
+                `${String(row.estimated_delivery).slice(0, 10)}T18:00:00+05:30`
+            );
+        }
+
+        // Final fallback.
+        else if (!completesAt) {
+            completesAt = new Date(
+                startedAt.getTime() + 2 * 86400000
+            );
         }
 
         const remainingMs = completesAt.getTime() - now.getTime();
-        return { startedAt, completesAt, remainingMs, completed: remainingMs <= 0 };
+
+        return {
+            startedAt,
+            completesAt,
+            remainingMs,
+            completed: remainingMs <= 0
+        };
     }
 
     function formatCountdown(milliseconds) {
