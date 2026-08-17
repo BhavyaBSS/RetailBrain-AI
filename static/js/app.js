@@ -26,6 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Initialize Navigation & Event Listeners
     initNavigation();
+    initMobileSidebar();
     initSimulators();
     initActionButtons();
     
@@ -46,6 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 e.preventDefault();
                 const tabTarget = item.getAttribute('data-tab');
                 switchTab(tabTarget);
+                closeMobileSidebar();
             });
         });
 
@@ -54,8 +56,44 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.addEventListener('click', () => {
                 const target = btn.getAttribute('data-tab-target');
                 switchTab(target);
+                closeMobileSidebar();
             });
         });
+    }
+
+    /* ==========================================================================
+       MOBILE SIDEBAR (hamburger drawer for phones & tablets)
+       ========================================================================== */
+    function initMobileSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+        const openBtn = document.getElementById('hamburger-btn');
+        const closeBtn = document.getElementById('sidebar-close-btn');
+
+        if (!sidebar || !overlay || !openBtn) return;
+
+        openBtn.addEventListener('click', () => {
+            sidebar.classList.add('is-open');
+            overlay.classList.add('is-open');
+            openBtn.setAttribute('aria-expanded', 'true');
+        });
+
+        if (closeBtn) closeBtn.addEventListener('click', closeMobileSidebar);
+        overlay.addEventListener('click', closeMobileSidebar);
+
+        // Close the drawer automatically if the viewport is resized back up to desktop width
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 1024) closeMobileSidebar();
+        });
+    }
+
+    function closeMobileSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+        const openBtn = document.getElementById('hamburger-btn');
+        if (sidebar) sidebar.classList.remove('is-open');
+        if (overlay) overlay.classList.remove('is-open');
+        if (openBtn) openBtn.setAttribute('aria-expanded', 'false');
     }
 
     function switchTab(tabId) {

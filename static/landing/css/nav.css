@@ -406,3 +406,16 @@
         flex-direction: column;
     }
 }
+
+@media (max-width: 640px) {
+    .global-nav-bar {
+        max-width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        justify-content: flex-start;
+    }
+    .global-nav-bar::-webkit-scrollbar { display: none; }
+    .nav-link-btn { padding: 6px 10px; font-size: 0.72rem; }
+    .nav-modal-content { padding: 18px 16px; width: 94vw; }
+    .kpi-cards-grid { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
+}

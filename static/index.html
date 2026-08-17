@@ -21,9 +21,28 @@
 </head>
 <body class="dark-theme">
     <div class="app-container">
+
+        <!-- Mobile top bar (hamburger + brand), shown only on small screens -->
+        <div class="mobile-topbar">
+            <button class="hamburger-btn" id="hamburger-btn" aria-label="Open menu" aria-expanded="false">
+                <i data-lucide="menu"></i>
+            </button>
+            <div class="mobile-topbar-brand">
+                <div class="logo-glow-icon logo-glow-icon-sm">
+                    <i data-lucide="brain-circuit" class="logo-icon"></i>
+                </div>
+                <span class="brand-text">RetailBrain</span>
+            </div>
+        </div>
+
+        <!-- Overlay shown behind the sidebar when it's open on mobile/tablet -->
+        <div class="sidebar-overlay" id="sidebar-overlay"></div>
         
         <!-- Sidebar Navigation -->
-        <aside class="sidebar">
+        <aside class="sidebar" id="sidebar">
+            <button class="sidebar-close-btn" id="sidebar-close-btn" aria-label="Close menu">
+                <i data-lucide="x"></i>
+            </button>
             <div class="brand">
                 <div class="brand-logo">
                     <div class="logo-glow-icon">

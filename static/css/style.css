@@ -944,3 +944,165 @@ input[type="range"] {
     white-space: pre-wrap;
     border: 1px solid var(--border-color);
 }
+
+/* ==========================================================================
+   Mobile Top Bar & Sidebar Off-canvas Controls
+   (hidden by default on desktop; enabled inside the responsive breakpoints)
+   ========================================================================== */
+.mobile-topbar {
+    display: none;
+    align-items: center;
+    gap: 12px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    z-index: 90;
+    padding: 14px 16px;
+    background: rgba(11, 15, 26, 0.95);
+    border-bottom: 1px solid var(--border-color);
+    backdrop-filter: blur(12px);
+    box-sizing: border-box;
+}
+
+.hamburger-btn, .sidebar-close-btn {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: var(--radius-md);
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.hamburger-btn:hover, .sidebar-close-btn:hover {
+    background: rgba(255, 255, 255, 0.12);
+    color: var(--color-cyan);
+}
+
+.sidebar-close-btn {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+}
+
+.mobile-topbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.logo-glow-icon-sm {
+    width: 32px;
+    height: 32px;
+}
+
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(4, 6, 11, 0.7);
+    backdrop-filter: blur(2px);
+    z-index: 99;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+}
+
+.sidebar-overlay.is-open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* ==========================================================================
+   Responsive Breakpoints
+   ========================================================================== */
+
+/* ---------- Tablets / small laptops (iPad, iPad Pro portrait, etc.) ---------- */
+@media (max-width: 1180px) {
+    .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+    .dashboard-grid { grid-template-columns: 1fr; }
+    .simulation-grid,
+    .forecast-grid { grid-template-columns: 1fr; }
+    .history-sections { grid-template-columns: 1fr; }
+    .action-buttons-row { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ---------- Tablets & below: collapse sidebar to an off-canvas drawer ---------- */
+@media (max-width: 1024px) {
+    .mobile-topbar { display: flex; }
+    .hamburger-btn { display: flex; }
+    .sidebar-close-btn { display: flex; }
+    .sidebar-overlay { display: block; }
+
+    .sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        z-index: 200;
+        width: min(280px, 82vw);
+    }
+
+    .sidebar.is-open {
+        transform: translateX(0);
+        box-shadow: 20px 0 50px rgba(0, 0, 0, 0.6);
+    }
+
+    .main-content {
+        margin-left: 0;
+        width: 100%;
+        max-width: 100%;
+        padding: 84px 20px 20px;
+    }
+
+    .header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 14px;
+    }
+
+    .header-actions {
+        width: 100%;
+        flex-wrap: wrap;
+    }
+}
+
+/* ---------- Phones (portrait & landscape) ---------- */
+@media (max-width: 768px) {
+    .kpi-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+    .kpi-card { padding: 16px; gap: 12px; }
+    .kpi-value { font-size: 20px; }
+
+    .action-buttons-row { grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    .header-titles h1 { font-size: 22px; }
+    .header-subtitle { font-size: 13px; }
+
+    .glass-card { padding: 16px; }
+
+    .table-toolbar { flex-direction: column; align-items: stretch; }
+    .toolbar-search { max-width: 100%; }
+    .toolbar-filters { flex-wrap: wrap; }
+    .toolbar-filters select, .form-select { min-width: 140px; width: auto; flex: 1; }
+
+    .sim-kpi-row { grid-template-columns: 1fr; }
+    .console-card { height: 420px; }
+
+    .chart-container { height: 220px; }
+    .chart-container-large { height: 300px; }
+}
+
+/* ---------- Small phones ---------- */
+@media (max-width: 480px) {
+    .main-content { padding: 78px 14px 14px; }
+    .kpi-grid { grid-template-columns: 1fr; }
+    .action-buttons-row { grid-template-columns: 1fr; }
+    .header-titles h1 { font-size: 19px; }
+    .glass-card { padding: 14px; border-radius: var(--radius-md); }
+    .card-header-title h3 { font-size: 15px; }
+    .mobile-topbar-brand .brand-text { font-size: 18px; }
+}

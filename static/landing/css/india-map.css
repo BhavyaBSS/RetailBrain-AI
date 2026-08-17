@@ -302,3 +302,22 @@ html, body {
     text-align: center;
     font-weight: 600;
 }
+
+/* ---------- Responsive: tablets ---------- */
+@media (max-width: 900px) {
+    .map-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+        padding: 16px 16px 0;
+    }
+    .map-header-right { pointer-events: auto; }
+}
+
+/* ---------- Responsive: phones ---------- */
+@media (max-width: 560px) {
+    .map-header { padding: 12px 12px 0; }
+    .map-title { font-size: 1.3rem; }
+    .map-subtitle { font-size: 0.82rem; }
+    .city-info, .store-info { min-width: 170px; max-width: 78vw; padding: 10px 12px; }
+}
