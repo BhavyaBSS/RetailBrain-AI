@@ -880,6 +880,12 @@ input[type="range"] {
     max-height: 520px;
     overflow-y: auto;
     padding-right: 8px;
+
+    /* Smooth momentum scrolling + keep the drag gesture on this list
+       instead of letting it bubble up to the page on touch devices */
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+    overscroll-behavior: contain;
 }
 
 /* Audit Log scrollbar */
@@ -1094,6 +1100,10 @@ input[type="range"] {
 
     .chart-container { height: 220px; }
     .chart-container-large { height: 300px; }
+
+    /* Audit Log: shorter scroll box so it doesn't dominate a phone screen,
+       but still confined + scrollable within itself */
+    .history-list { max-height: 340px; }
 }
 
 /* ---------- Small phones ---------- */
@@ -1105,4 +1115,7 @@ input[type="range"] {
     .glass-card { padding: 14px; border-radius: var(--radius-md); }
     .card-header-title h3 { font-size: 15px; }
     .mobile-topbar-brand .brand-text { font-size: 18px; }
+
+    .history-list { max-height: 280px; }
+    .history-item { font-size: 11px; padding: 10px 12px; }
 }
