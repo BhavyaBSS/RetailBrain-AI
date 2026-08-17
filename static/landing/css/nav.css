@@ -460,4 +460,8 @@
         width: auto;
         padding-right: 8px;
     }
+
+    .nav-modal-content.is-audit-wide #nav-modal-body {
+        overflow-y: auto !important;
+    }
 }
