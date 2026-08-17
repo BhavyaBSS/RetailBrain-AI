@@ -672,7 +672,7 @@ def approve_purchase_order(
     transaction_time = datetime.now(IST)
     dispatch_entry = {
         "po_number": po_number,
-        "timestamp": transaction_time.strftime("%Y-%m-%d %H:%M:%S"),
+        "timestamp": transaction_time.isoformat(),
         "store_id": store_id,
         "product_id": product_id,
         "supplier_name": supplier_name,
@@ -681,7 +681,7 @@ def approve_purchase_order(
         "status": "DISPATCHED_TO_SUPPLIER",
         "estimated_delivery": (
             transaction_time + timedelta(days=2)
-        ).strftime("%Y-%m-%d")
+        ).isoformat()
     }
     
     # Persist action to CSV log
@@ -714,7 +714,7 @@ def approve_stock_transfer(
     eta_time = transaction_time + timedelta(minutes=45)
     transfer_entry = {
         "transfer_id": transfer_id,
-        "timestamp": transaction_time.strftime("%Y-%m-%d %H:%M:%S"),
+        "timestamp": transaction_time.isoformat(),
         "from_store": from_store,
         "to_store": to_store,
         "product_id": product_id,
@@ -722,7 +722,7 @@ def approve_stock_transfer(
         "city": city,
         "status": "IN_TRANSIT",
         "eta": "45 minutes",
-        "eta_at": eta_time.strftime("%Y-%m-%d %H:%M:%S")
+        "eta_at": eta_time.isoformat()
     }
     
     # Persist action to CSV log
@@ -812,7 +812,7 @@ def ingest_new_data(
         if auto_trigger_retrain and not pipeline_state["is_running"]:
             os.makedirs(cfg.OUTPUT_DIR, exist_ok=True)
             with open(pipeline_state["log_file"], "w", encoding="utf-8") as f:
-                f.write(f"--- Pipeline Execution Initialized via Data Ingestion API at {datetime.now(IST).strftime('%Y-%m-%d %H:%M:%S')} ---\n")
+                f.write(f"--- Pipeline Execution Initialized via Data Ingestion API at {datetime.now(IST).isoformat()} ---\n")
             background_tasks.add_task(run_pipeline_worker)
             retrain_status = "Pipeline retrain worker triggered in background!"
             
@@ -842,7 +842,7 @@ def trigger_pipeline(background_tasks: BackgroundTasks):
     
     os.makedirs(cfg.OUTPUT_DIR, exist_ok=True)
     with open(pipeline_state["log_file"], "w", encoding="utf-8") as f:
-        f.write(f"--- Pipeline Execution Initialized via Web API at {datetime.now(IST).strftime('%Y-%m-%d %H:%M:%S')} ---\n")
+        f.write(f"--- Pipeline Execution Initialized via Web API at {datetime.now(IST).isoformat()} ---\n")
     
     background_tasks.add_task(run_pipeline_worker)
     return {
