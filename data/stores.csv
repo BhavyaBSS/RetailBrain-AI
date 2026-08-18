@@ -1,101 +1,101 @@
 Store_ID,Store_Name,City,Locality,Store_Type,Capacity,Latitude,Longitude
-BST-001,Blinkit Karol Bagh Store,Delhi NCR,Karol Bagh,Dark Store,50000,28.6448,77.1873
-BST-002,Blinkit Saket Store,Delhi NCR,Saket,Dark Store,50000,28.5244,77.2167
-BST-003,Blinkit Vasant Kunj Store,Delhi NCR,Vasant Kunj,Dark Store,50000,28.5292,77.1524
-BST-004,Blinkit Dwarka Sector 10 Store,Delhi NCR,Dwarka Sector 10,Dark Store,50000,28.581,77.0581
-BST-005,Blinkit Laxmi Nagar Store,Delhi NCR,Laxmi Nagar,Dark Store,50000,28.6304,77.2777
-BST-006,Blinkit Vijay Nagar (North Campus) Store,Delhi NCR,Vijay Nagar (North Campus),Dark Store,50000,28.694,77.202
-BST-007,Blinkit Rajouri Garden Store,Delhi NCR,Rajouri Garden,Dark Store,50000,28.6415,77.1218
-BST-008,Blinkit Greater Kailash 2 Store,Delhi NCR,Greater Kailash 2,Dark Store,50000,28.532,77.2437
-BST-009,Blinkit Hauz Khas Store,Delhi NCR,Hauz Khas,Dark Store,50000,28.5494,77.2001
-BST-010,Blinkit Rohini Sector 9 Store,Delhi NCR,Rohini Sector 9,Dark Store,50000,28.7156,77.1206
-BST-011,Blinkit Pitampura Store,Delhi NCR,Pitampura,Dark Store,50000,28.7037,77.1349
-BST-012,Blinkit Connaught Place Store,Delhi NCR,Connaught Place,Dark Store,50000,28.6304,77.2177
-BST-013,Blinkit Janakpuri Store,Delhi NCR,Janakpuri,Dark Store,50000,28.6219,77.0878
-BST-014,Blinkit Mayur Vihar Phase 1 Store,Delhi NCR,Mayur Vihar Phase 1,Dark Store,50000,28.608,77.291
-BST-015,Blinkit Noida Sector 62 Store,Delhi NCR,Noida Sector 62,Dark Store,50000,28.624,77.371
-BST-016,Blinkit Noida Sector 15 Store,Delhi NCR,Noida Sector 15,Dark Store,50000,28.5833,77.3167
-BST-017,Blinkit Noida Sector 137 Store,Delhi NCR,Noida Sector 137,Dark Store,50000,28.5035,77.4022
-BST-018,Blinkit Indirapuram (Ghaziabad) Store,Delhi NCR,Indirapuram (Ghaziabad),Dark Store,50000,28.636,77.369
-BST-019,Blinkit Vasundhara (Ghaziabad) Store,Delhi NCR,Vasundhara (Ghaziabad),Dark Store,50000,28.66,77.36
-BST-020,Blinkit DLF Phase 3 (Gurugram) Store,Delhi NCR,DLF Phase 3 (Gurugram),Dark Store,50000,28.49,77.09
-BST-021,Blinkit Sohna Road (Gurugram) Store,Delhi NCR,Sohna Road (Gurugram),Dark Store,50000,28.41,77.04
-BST-022,Blinkit Gurugram Sector 56 Store,Delhi NCR,Gurugram Sector 56,Dark Store,50000,28.4319,77.099
-BST-023,Blinkit Gurugram Sector 45 Store,Delhi NCR,Gurugram Sector 45,Dark Store,50000,28.45,77.07
-BST-024,Blinkit Faridabad Sector 15 Store,Delhi NCR,Faridabad Sector 15,Dark Store,50000,28.4167,77.3167
-BST-025,Blinkit Faridabad Sector 21 Store,Delhi NCR,Faridabad Sector 21,Dark Store,50000,28.43,77.29
-BST-026,Blinkit Koramangala 4th Block Store,Bengaluru,Koramangala 4th Block,Dark Store,50000,12.9345,77.6267
-BST-027,Blinkit Indiranagar 100ft Rd Store,Bengaluru,Indiranagar 100ft Rd,Dark Store,50000,12.9718,77.6411
-BST-028,Blinkit HSR Layout Sector 3 Store,Bengaluru,HSR Layout Sector 3,Dark Store,50000,12.9102,77.645
-BST-029,Blinkit Whitefield ITPL Store,Bengaluru,Whitefield ITPL,Dark Store,50000,12.984,77.73
-BST-030,Blinkit Bellandur Store,Bengaluru,Bellandur,Dark Store,50000,12.9304,77.6784
-BST-031,Blinkit Marathahalli Bridge Store,Bengaluru,Marathahalli Bridge,Dark Store,50000,12.9562,77.701
-BST-032,Blinkit Electronic City Phase 1 Store,Bengaluru,Electronic City Phase 1,Dark Store,50000,12.8452,77.6638
-BST-033,Blinkit Jayanagar 4th Block Store,Bengaluru,Jayanagar 4th Block,Dark Store,50000,12.928,77.583
-BST-034,Blinkit Malleshwaram 15th Cross Store,Bengaluru,Malleshwaram 15th Cross,Dark Store,50000,12.998,77.571
-BST-035,Blinkit BTM Layout 2nd Stage Store,Bengaluru,BTM Layout 2nd Stage,Dark Store,50000,12.9166,77.6101
-BST-036,Blinkit JP Nagar 3rd Phase Store,Bengaluru,JP Nagar 3rd Phase,Dark Store,50000,12.909,77.59
-BST-037,Blinkit Banashankari 3rd Stage Store,Bengaluru,Banashankari 3rd Stage,Dark Store,50000,12.925,77.546
-BST-038,Blinkit Hebbal Outer Ring Rd Store,Bengaluru,Hebbal Outer Ring Rd,Dark Store,50000,13.035,77.597
-BST-039,Blinkit Yelahanka New Town Store,Bengaluru,Yelahanka New Town,Dark Store,50000,13.098,77.596
-BST-040,Blinkit Rajajinagar 1st Block Store,Bengaluru,Rajajinagar 1st Block,Dark Store,50000,12.988,77.554
-BST-041,Blinkit Kalyan Nagar Store,Bengaluru,Kalyan Nagar,Dark Store,50000,13.022,77.64
-BST-042,Blinkit Bannerghatta Rd (Arakere) Store,Bengaluru,Bannerghatta Rd (Arakere),Dark Store,50000,12.889,77.599
-BST-043,Blinkit Sadashivanagar Store,Bengaluru,Sadashivanagar,Dark Store,50000,13.0068,77.5815
-BST-044,Blinkit Sarjapur Road Store,Bengaluru,Sarjapur Road,Dark Store,50000,12.9096,77.6842
-BST-045,Blinkit Basaveshwaranagar Store,Bengaluru,Basaveshwaranagar,Dark Store,50000,12.986,77.537
-BST-046,Blinkit Bandra West (Hill Rd) Store,Mumbai,Bandra West (Hill Rd),Dark Store,50000,19.0583,72.8302
-BST-047,Blinkit Andheri West (Lokhandwala) Store,Mumbai,Andheri West (Lokhandwala),Dark Store,50000,19.1363,72.8276
-BST-048,Blinkit Juhu Scheme Store,Mumbai,Juhu Scheme,Dark Store,50000,19.1062,72.8258
-BST-049,Blinkit Powai (Hiranandani) Store,Mumbai,Powai (Hiranandani),Dark Store,50000,19.1176,72.906
-BST-050,Blinkit Worli Naka Store,Mumbai,Worli Naka,Dark Store,50000,19.0118,72.818
-BST-051,Blinkit Colaba Cause Way Store,Mumbai,Colaba Cause Way,Dark Store,50000,18.915,72.8258
-BST-052,Blinkit Chembur East Store,Mumbai,Chembur East,Dark Store,50000,19.06,72.9
-BST-053,Blinkit Borivali West Store,Mumbai,Borivali West,Dark Store,50000,19.23,72.85
-BST-054,Blinkit Mulund West Store,Mumbai,Mulund West,Dark Store,50000,19.17,72.95
-BST-055,Blinkit Thane West (Ghodbunder) Store,Mumbai,Thane West (Ghodbunder),Dark Store,50000,19.22,72.97
-BST-056,Blinkit Vashi Sector 17 (Navi Mumbai) Store,Mumbai,Vashi Sector 17 (Navi Mumbai),Dark Store,50000,19.076,72.999
-BST-057,Blinkit Kharghar Sector 20 Store,Mumbai,Kharghar Sector 20,Dark Store,50000,19.03,73.06
-BST-058,Blinkit Malad West Store,Mumbai,Malad West,Dark Store,50000,19.18,72.83
-BST-059,Blinkit Santacruz West Store,Mumbai,Santacruz West,Dark Store,50000,19.08,72.83
-BST-060,Blinkit Ghatkopar East Store,Mumbai,Ghatkopar East,Dark Store,50000,19.086,72.908
-BST-061,Blinkit Kothrud Depot Store,Pune,Kothrud Depot,Dark Store,50000,18.5074,73.8077
-BST-062,Blinkit Viman Nagar Store,Pune,Viman Nagar,Dark Store,50000,18.5679,73.9143
-BST-063,Blinkit Hinjewadi Phase 1 Store,Pune,Hinjewadi Phase 1,Dark Store,50000,18.5913,73.7389
-BST-064,Blinkit Baner High Street Store,Pune,Baner High Street,Dark Store,50000,18.558,73.7915
-BST-065,Blinkit Kalyani Nagar Store,Pune,Kalyani Nagar,Dark Store,50000,18.547,73.903
-BST-066,Blinkit Koregaon Park Road Store,Pune,Koregaon Park Road,Dark Store,50000,18.5362,73.894
-BST-067,Blinkit Hadapsar (Magarpatta) Store,Pune,Hadapsar (Magarpatta),Dark Store,50000,18.513,73.926
-BST-068,Blinkit Aundh Chest Hospital Rd Store,Pune,Aundh Chest Hospital Rd,Dark Store,50000,18.559,73.807
-BST-069,Blinkit Karve Nagar Store,Pune,Karve Nagar,Dark Store,50000,18.49,73.81
-BST-070,Blinkit Pimpri Chowk Store,Pune,Pimpri Chowk,Dark Store,50000,18.627,73.8
-BST-071,Blinkit Gachibowli DLF Store,Hyderabad,Gachibowli DLF,Dark Store,50000,17.4447,78.3498
-BST-072,Blinkit Madhapur (Hitech City) Store,Hyderabad,Madhapur (Hitech City),Dark Store,50000,17.4483,78.3841
-BST-073,Blinkit Jubilee Hills Rd 36 Store,Hyderabad,Jubilee Hills Rd 36,Dark Store,50000,17.4334,78.4062
-BST-074,Blinkit Banjara Hills Rd 12 Store,Hyderabad,Banjara Hills Rd 12,Dark Store,50000,17.414,78.4325
-BST-075,Blinkit Ameerpet Metro Store,Hyderabad,Ameerpet Metro,Dark Store,50000,17.4375,78.4482
-BST-076,Blinkit Kukatpally JNTU Store,Hyderabad,Kukatpally JNTU,Dark Store,50000,17.4938,78.3914
-BST-077,Blinkit Begumpet Rd Store,Hyderabad,Begumpet Rd,Dark Store,50000,17.44,78.46
-BST-078,Blinkit Kondapur Botanical Garden Store,Hyderabad,Kondapur Botanical Garden,Dark Store,50000,17.46,78.36
-BST-079,Blinkit Secunderabad Club Store,Hyderabad,Secunderabad Club,Dark Store,50000,17.4439,78.4897
-BST-080,Blinkit Miyapur X Roads Store,Hyderabad,Miyapur X Roads,Dark Store,50000,17.496,78.349
-BST-081,Blinkit Adyar Depot Store,Chennai,Adyar Depot,Dark Store,50000,13.0063,80.2575
-BST-082,Blinkit Velachery Bypass Rd Store,Chennai,Velachery Bypass Rd,Dark Store,50000,12.9801,80.2228
-BST-083,Blinkit T. Nagar (Pondy Bazaar) Store,Chennai,T. Nagar (Pondy Bazaar),Dark Store,50000,13.0405,80.2337
-BST-084,Blinkit Nungambakkam High Rd Store,Chennai,Nungambakkam High Rd,Dark Store,50000,13.0607,80.2458
-BST-085,Blinkit OMR Karapakkam Store,Chennai,OMR Karapakkam,Dark Store,50000,12.923,80.23
-BST-086,Blinkit Anna Nagar East Store,Chennai,Anna Nagar East,Dark Store,50000,13.085,80.2183
-BST-087,Blinkit Mylapore Tank Store,Chennai,Mylapore Tank,Dark Store,50000,13.033,80.268
-BST-088,Blinkit Tambaram West Store,Chennai,Tambaram West,Dark Store,50000,12.926,80.12
-BST-089,Blinkit Guindy Industrial Estate Store,Chennai,Guindy Industrial Estate,Dark Store,50000,13.01,80.21
-BST-090,Blinkit Sholinganallur Junction Store,Chennai,Sholinganallur Junction,Dark Store,50000,12.9,80.23
-BST-091,Blinkit Salt Lake Sector V Store,Kolkata,Salt Lake Sector V,Dark Store,50000,22.5735,88.4331
-BST-092,Blinkit Park Street Store,Kolkata,Park Street,Dark Store,50000,22.5487,88.3512
-BST-093,Blinkit Gariahat Crossing Store,Kolkata,Gariahat Crossing,Dark Store,50000,22.519,88.3662
-BST-094,Blinkit New Town (Action Area 1) Store,Kolkata,New Town (Action Area 1),Dark Store,50000,22.58,88.47
-BST-095,Blinkit Tollygunge (Tram Depot) Store,Kolkata,Tollygunge (Tram Depot),Dark Store,50000,22.493,88.347
-BST-096,Blinkit Ballygunge Circular Rd Store,Kolkata,Ballygunge Circular Rd,Dark Store,50000,22.531,88.363
-BST-097,Blinkit Behala Chowrasta Store,Kolkata,Behala Chowrasta,Dark Store,50000,22.491,88.318
-BST-098,Blinkit Dum Dum Station Store,Kolkata,Dum Dum Station,Dark Store,50000,22.62,88.4
-BST-099,Blinkit Howrah AC Market Store,Kolkata,Howrah AC Market,Dark Store,50000,22.58,88.33
-BST-100,Blinkit Lake Gardens Store,Kolkata,Lake Gardens,Dark Store,50000,22.508,88.36
+BST-001,Karol Bagh Store,Delhi NCR,Karol Bagh,Dark Store,50000,28.6448,77.1873
+BST-002,Saket Store,Delhi NCR,Saket,Dark Store,50000,28.5244,77.2167
+BST-003,Vasant Kunj Store,Delhi NCR,Vasant Kunj,Dark Store,50000,28.5292,77.1524
+BST-004,Dwarka Sector 10 Store,Delhi NCR,Dwarka Sector 10,Dark Store,50000,28.581,77.0581
+BST-005,Laxmi Nagar Store,Delhi NCR,Laxmi Nagar,Dark Store,50000,28.6304,77.2777
+BST-006,Vijay Nagar (North Campus) Store,Delhi NCR,Vijay Nagar (North Campus),Dark Store,50000,28.694,77.202
+BST-007,Rajouri Garden Store,Delhi NCR,Rajouri Garden,Dark Store,50000,28.6415,77.1218
+BST-008,Greater Kailash 2 Store,Delhi NCR,Greater Kailash 2,Dark Store,50000,28.532,77.2437
+BST-009,Hauz Khas Store,Delhi NCR,Hauz Khas,Dark Store,50000,28.5494,77.2001
+BST-010,Rohini Sector 9 Store,Delhi NCR,Rohini Sector 9,Dark Store,50000,28.7156,77.1206
+BST-011,Pitampura Store,Delhi NCR,Pitampura,Dark Store,50000,28.7037,77.1349
+BST-012,Connaught Place Store,Delhi NCR,Connaught Place,Dark Store,50000,28.6304,77.2177
+BST-013,Janakpuri Store,Delhi NCR,Janakpuri,Dark Store,50000,28.6219,77.0878
+BST-014,Mayur Vihar Phase 1 Store,Delhi NCR,Mayur Vihar Phase 1,Dark Store,50000,28.608,77.291
+BST-015,Noida Sector 62 Store,Delhi NCR,Noida Sector 62,Dark Store,50000,28.624,77.371
+BST-016,Noida Sector 15 Store,Delhi NCR,Noida Sector 15,Dark Store,50000,28.5833,77.3167
+BST-017,Noida Sector 137 Store,Delhi NCR,Noida Sector 137,Dark Store,50000,28.5035,77.4022
+BST-018,Indirapuram (Ghaziabad) Store,Delhi NCR,Indirapuram (Ghaziabad),Dark Store,50000,28.636,77.369
+BST-019,Vasundhara (Ghaziabad) Store,Delhi NCR,Vasundhara (Ghaziabad),Dark Store,50000,28.66,77.36
+BST-020,DLF Phase 3 (Gurugram) Store,Delhi NCR,DLF Phase 3 (Gurugram),Dark Store,50000,28.49,77.09
+BST-021,Sohna Road (Gurugram) Store,Delhi NCR,Sohna Road (Gurugram),Dark Store,50000,28.41,77.04
+BST-022,Gurugram Sector 56 Store,Delhi NCR,Gurugram Sector 56,Dark Store,50000,28.4319,77.099
+BST-023,Gurugram Sector 45 Store,Delhi NCR,Gurugram Sector 45,Dark Store,50000,28.45,77.07
+BST-024,Faridabad Sector 15 Store,Delhi NCR,Faridabad Sector 15,Dark Store,50000,28.4167,77.3167
+BST-025,Faridabad Sector 21 Store,Delhi NCR,Faridabad Sector 21,Dark Store,50000,28.43,77.29
+BST-026,Koramangala 4th Block Store,Bengaluru,Koramangala 4th Block,Dark Store,50000,12.9345,77.6267
+BST-027,Indiranagar 100ft Rd Store,Bengaluru,Indiranagar 100ft Rd,Dark Store,50000,12.9718,77.6411
+BST-028,HSR Layout Sector 3 Store,Bengaluru,HSR Layout Sector 3,Dark Store,50000,12.9102,77.645
+BST-029,Whitefield ITPL Store,Bengaluru,Whitefield ITPL,Dark Store,50000,12.984,77.73
+BST-030,Bellandur Store,Bengaluru,Bellandur,Dark Store,50000,12.9304,77.6784
+BST-031,Marathahalli Bridge Store,Bengaluru,Marathahalli Bridge,Dark Store,50000,12.9562,77.701
+BST-032,Electronic City Phase 1 Store,Bengaluru,Electronic City Phase 1,Dark Store,50000,12.8452,77.6638
+BST-033,Jayanagar 4th Block Store,Bengaluru,Jayanagar 4th Block,Dark Store,50000,12.928,77.583
+BST-034,Malleshwaram 15th Cross Store,Bengaluru,Malleshwaram 15th Cross,Dark Store,50000,12.998,77.571
+BST-035,BTM Layout 2nd Stage Store,Bengaluru,BTM Layout 2nd Stage,Dark Store,50000,12.9166,77.6101
+BST-036,JP Nagar 3rd Phase Store,Bengaluru,JP Nagar 3rd Phase,Dark Store,50000,12.909,77.59
+BST-037,Banashankari 3rd Stage Store,Bengaluru,Banashankari 3rd Stage,Dark Store,50000,12.925,77.546
+BST-038,Hebbal Outer Ring Rd Store,Bengaluru,Hebbal Outer Ring Rd,Dark Store,50000,13.035,77.597
+BST-039,Yelahanka New Town Store,Bengaluru,Yelahanka New Town,Dark Store,50000,13.098,77.596
+BST-040,Rajajinagar 1st Block Store,Bengaluru,Rajajinagar 1st Block,Dark Store,50000,12.988,77.554
+BST-041,Kalyan Nagar Store,Bengaluru,Kalyan Nagar,Dark Store,50000,13.022,77.64
+BST-042,Bannerghatta Rd (Arakere) Store,Bengaluru,Bannerghatta Rd (Arakere),Dark Store,50000,12.889,77.599
+BST-043,Sadashivanagar Store,Bengaluru,Sadashivanagar,Dark Store,50000,13.0068,77.5815
+BST-044,Sarjapur Road Store,Bengaluru,Sarjapur Road,Dark Store,50000,12.9096,77.6842
+BST-045,Basaveshwaranagar Store,Bengaluru,Basaveshwaranagar,Dark Store,50000,12.986,77.537
+BST-046,Bandra West (Hill Rd) Store,Mumbai,Bandra West (Hill Rd),Dark Store,50000,19.0583,72.8302
+BST-047,Andheri West (Lokhandwala) Store,Mumbai,Andheri West (Lokhandwala),Dark Store,50000,19.1363,72.8276
+BST-048,Juhu Scheme Store,Mumbai,Juhu Scheme,Dark Store,50000,19.1062,72.8258
+BST-049,Powai (Hiranandani) Store,Mumbai,Powai (Hiranandani),Dark Store,50000,19.1176,72.906
+BST-050,Worli Naka Store,Mumbai,Worli Naka,Dark Store,50000,19.0118,72.818
+BST-051,Colaba Cause Way Store,Mumbai,Colaba Cause Way,Dark Store,50000,18.915,72.8258
+BST-052,Chembur East Store,Mumbai,Chembur East,Dark Store,50000,19.06,72.9
+BST-053,Borivali West Store,Mumbai,Borivali West,Dark Store,50000,19.23,72.85
+BST-054,Mulund West Store,Mumbai,Mulund West,Dark Store,50000,19.17,72.95
+BST-055,Thane West (Ghodbunder) Store,Mumbai,Thane West (Ghodbunder),Dark Store,50000,19.22,72.97
+BST-056,Vashi Sector 17 (Navi Mumbai) Store,Mumbai,Vashi Sector 17 (Navi Mumbai),Dark Store,50000,19.076,72.999
+BST-057,Kharghar Sector 20 Store,Mumbai,Kharghar Sector 20,Dark Store,50000,19.03,73.06
+BST-058,Malad West Store,Mumbai,Malad West,Dark Store,50000,19.18,72.83
+BST-059,Santacruz West Store,Mumbai,Santacruz West,Dark Store,50000,19.08,72.83
+BST-060,Ghatkopar East Store,Mumbai,Ghatkopar East,Dark Store,50000,19.086,72.908
+BST-061,Kothrud Depot Store,Pune,Kothrud Depot,Dark Store,50000,18.5074,73.8077
+BST-062,Viman Nagar Store,Pune,Viman Nagar,Dark Store,50000,18.5679,73.9143
+BST-063,Hinjewadi Phase 1 Store,Pune,Hinjewadi Phase 1,Dark Store,50000,18.5913,73.7389
+BST-064,Baner High Street Store,Pune,Baner High Street,Dark Store,50000,18.558,73.7915
+BST-065,Kalyani Nagar Store,Pune,Kalyani Nagar,Dark Store,50000,18.547,73.903
+BST-066,Koregaon Park Road Store,Pune,Koregaon Park Road,Dark Store,50000,18.5362,73.894
+BST-067,Hadapsar (Magarpatta) Store,Pune,Hadapsar (Magarpatta),Dark Store,50000,18.513,73.926
+BST-068,Aundh Chest Hospital Rd Store,Pune,Aundh Chest Hospital Rd,Dark Store,50000,18.559,73.807
+BST-069,Karve Nagar Store,Pune,Karve Nagar,Dark Store,50000,18.49,73.81
+BST-070,Pimpri Chowk Store,Pune,Pimpri Chowk,Dark Store,50000,18.627,73.8
+BST-071,Gachibowli DLF Store,Hyderabad,Gachibowli DLF,Dark Store,50000,17.4447,78.3498
+BST-072,Madhapur (Hitech City) Store,Hyderabad,Madhapur (Hitech City),Dark Store,50000,17.4483,78.3841
+BST-073,Jubilee Hills Rd 36 Store,Hyderabad,Jubilee Hills Rd 36,Dark Store,50000,17.4334,78.4062
+BST-074,Banjara Hills Rd 12 Store,Hyderabad,Banjara Hills Rd 12,Dark Store,50000,17.414,78.4325
+BST-075,Ameerpet Metro Store,Hyderabad,Ameerpet Metro,Dark Store,50000,17.4375,78.4482
+BST-076,Kukatpally JNTU Store,Hyderabad,Kukatpally JNTU,Dark Store,50000,17.4938,78.3914
+BST-077,Begumpet Rd Store,Hyderabad,Begumpet Rd,Dark Store,50000,17.44,78.46
+BST-078,Kondapur Botanical Garden Store,Hyderabad,Kondapur Botanical Garden,Dark Store,50000,17.46,78.36
+BST-079,Secunderabad Club Store,Hyderabad,Secunderabad Club,Dark Store,50000,17.4439,78.4897
+BST-080,Miyapur X Roads Store,Hyderabad,Miyapur X Roads,Dark Store,50000,17.496,78.349
+BST-081,Adyar Depot Store,Chennai,Adyar Depot,Dark Store,50000,13.0063,80.2575
+BST-082,Velachery Bypass Rd Store,Chennai,Velachery Bypass Rd,Dark Store,50000,12.9801,80.2228
+BST-083,T. Nagar (Pondy Bazaar) Store,Chennai,T. Nagar (Pondy Bazaar),Dark Store,50000,13.0405,80.2337
+BST-084,Nungambakkam High Rd Store,Chennai,Nungambakkam High Rd,Dark Store,50000,13.0607,80.2458
+BST-085,OMR Karapakkam Store,Chennai,OMR Karapakkam,Dark Store,50000,12.923,80.23
+BST-086,Anna Nagar East Store,Chennai,Anna Nagar East,Dark Store,50000,13.085,80.2183
+BST-087,Mylapore Tank Store,Chennai,Mylapore Tank,Dark Store,50000,13.033,80.268
+BST-088,Tambaram West Store,Chennai,Tambaram West,Dark Store,50000,12.926,80.12
+BST-089,Guindy Industrial Estate Store,Chennai,Guindy Industrial Estate,Dark Store,50000,13.01,80.21
+BST-090,Sholinganallur Junction Store,Chennai,Sholinganallur Junction,Dark Store,50000,12.9,80.23
+BST-091,Salt Lake Sector V Store,Kolkata,Salt Lake Sector V,Dark Store,50000,22.5735,88.4331
+BST-092,Park Street Store,Kolkata,Park Street,Dark Store,50000,22.5487,88.3512
+BST-093,Gariahat Crossing Store,Kolkata,Gariahat Crossing,Dark Store,50000,22.519,88.3662
+BST-094,New Town (Action Area 1) Store,Kolkata,New Town (Action Area 1),Dark Store,50000,22.58,88.47
+BST-095,Tollygunge (Tram Depot) Store,Kolkata,Tollygunge (Tram Depot),Dark Store,50000,22.493,88.347
+BST-096,Ballygunge Circular Rd Store,Kolkata,Ballygunge Circular Rd,Dark Store,50000,22.531,88.363
+BST-097,Behala Chowrasta Store,Kolkata,Behala Chowrasta,Dark Store,50000,22.491,88.318
+BST-098,Dum Dum Station Store,Kolkata,Dum Dum Station,Dark Store,50000,22.62,88.4
+BST-099,Howrah AC Market Store,Kolkata,Howrah AC Market,Dark Store,50000,22.58,88.33
+BST-100,Lake Gardens Store,Kolkata,Lake Gardens,Dark Store,50000,22.508,88.36
