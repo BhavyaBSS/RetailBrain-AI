@@ -198,6 +198,11 @@ html, body {
     height: 16px;
     box-sizing: border-box;
     cursor: pointer;
+    z-index: 1;
+}
+
+.store-marker:hover {
+    z-index: 100;
 }
 
 .store-dot {
