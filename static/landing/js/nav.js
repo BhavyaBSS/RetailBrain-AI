@@ -334,9 +334,18 @@
                 startedAt.getTime() + amount * multiplier
             );
         } else if (!completesAt && row.estimated_delivery) {
-            completesAt = new Date(
-                `${String(row.estimated_delivery).slice(0, 10)}T18:00:00+05:30`
-            );
+            const rawDelivery = String(row.estimated_delivery);
+            // Newer backend rows send a full ISO timestamp (date + real
+            // computed time), e.g. "2026-08-19T15:42:17.067949+05:30".
+            // Older rows only ever had a bare date, e.g. "2026-08-18",
+            // for which there's no real time to use, so we keep the
+            // 6:00 PM fallback for those specifically.
+            const looksLikeFullTimestamp = rawDelivery.length > 10 && rawDelivery.includes("T");
+            const parsedFull = looksLikeFullTimestamp ? new Date(rawDelivery) : null;
+
+            completesAt = (parsedFull && !Number.isNaN(parsedFull.getTime()))
+                ? parsedFull
+                : new Date(`${rawDelivery.slice(0, 10)}T18:00:00+05:30`);
         } else if (!completesAt) {
             completesAt = new Date(
                 startedAt.getTime() + 2 * 86400000
