@@ -26,6 +26,7 @@ from fastapi.responses import FileResponse, PlainTextResponse
 
 from src import config as cfg
 from src import data_loader as dl
+from src import traffic_eta
 
 
 
@@ -670,6 +671,15 @@ def approve_purchase_order(
     """
     po_number = f"PO-BLK-{random.randint(100000, 999999)}"
     transaction_time = datetime.now(IST)
+
+    # Distance + live-traffic transit time (supplier -> store). This does
+    # NOT read or touch the supplier's Lead_Time field — that stays exactly
+    # as used elsewhere on the classic dashboard.
+    eta_result = traffic_eta.get_supplier_transfer_eta(
+        supplier_name, product_id, store_id, cfg.SUPPLIERS_FILE, cfg.STORES_FILE
+    )
+    lead_days = eta_result["total_lead_days"]
+
     dispatch_entry = {
         "po_number": po_number,
         "timestamp": transaction_time.isoformat(),
@@ -679,8 +689,10 @@ def approve_purchase_order(
         "order_qty": order_qty,
         "total_cost": total_cost,
         "status": "DISPATCHED_TO_SUPPLIER",
+        "transit_minutes": eta_result["transit_minutes"],
+        "distance_km": eta_result["distance_km"],
         "estimated_delivery": (
-            transaction_time + timedelta(days=2)
+            transaction_time + timedelta(days=lead_days)
         ).isoformat()
     }
     
@@ -711,7 +723,12 @@ def approve_stock_transfer(
     """
     transfer_id = f"TRK-{city[:3].upper()}-{random.randint(1000, 9999)}"
     transaction_time = datetime.now(IST)
-    eta_time = transaction_time + timedelta(minutes=45)
+
+    # Live-traffic ETA based on real store coordinates (Stores_Registry),
+    # instead of a hardcoded 45 minutes.
+    eta_result = traffic_eta.get_store_transfer_eta(from_store, to_store, cfg.STORES_FILE)
+    eta_time = transaction_time + timedelta(minutes=eta_result["duration_minutes"])
+
     transfer_entry = {
         "transfer_id": transfer_id,
         "timestamp": transaction_time.isoformat(),
@@ -721,7 +738,9 @@ def approve_stock_transfer(
         "transfer_qty": transfer_qty,
         "city": city,
         "status": "IN_TRANSIT",
-        "eta": "45 minutes",
+        "distance_km": eta_result["distance_km"],
+        "eta": traffic_eta.format_eta_for_log(eta_result),
+        "eta_minutes": eta_result["duration_minutes"],
         "eta_at": eta_time.isoformat()
     }
     
