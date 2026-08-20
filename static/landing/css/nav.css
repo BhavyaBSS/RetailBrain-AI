@@ -313,75 +313,150 @@
     width: 100%;
     flex: 1 1 auto;
     min-height: 0;
-    overflow-x: auto !important;
     overflow-y: auto !important;
+    overflow-x: hidden !important;
     overscroll-behavior: contain;
     -webkit-overflow-scrolling: touch;
 }
 
-/* Force horizontal table layout and keep items on 1 single line */
-.audit-table {
-    width: 100%;
-    min-width: 1050px;
-    border-collapse: collapse;
+.audit-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-right: 2px;
 }
 
-.audit-table th,
-.audit-table td {
-    vertical-align: middle;
-    white-space: nowrap;
-    padding: 10px 12px;
-}
-
-.audit-details-cell {
-    white-space: nowrap !important;
-}
-
-.audit-table thead th {
-    position: sticky;
-    top: 0;
-    z-index: 2;
-    background: #111a2d;
+.audit-card {
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    background: rgba(15, 23, 42, 0.55);
+    padding: 12px 14px;
 }
 
 .audit-row-completed {
     background: rgba(16, 185, 129, 0.045);
+    border-color: rgba(16, 185, 129, 0.16);
 }
 
 .audit-row-removed {
     opacity: 0.52;
 }
 
+.audit-card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.audit-card-type {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    min-width: 0;
+}
+
+.audit-type-badge {
+    font: 800 0.62rem var(--font-body, 'Inter', sans-serif);
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 6px;
+    white-space: nowrap;
+}
+
+.audit-type-po {
+    background: rgba(167, 139, 250, 0.16);
+    color: #c4b5fd;
+}
+
+.audit-type-transfer {
+    background: rgba(0, 242, 254, 0.14);
+    color: #67e8f9;
+}
+
+.audit-card-ref {
+    color: #cbd5e1;
+    font: 700 0.78rem 'JetBrains Mono', monospace;
+    word-break: break-word;
+}
+
+.audit-card-title {
+    margin-top: 8px;
+    color: #e2e8f0;
+    font-size: 0.82rem;
+    font-weight: 600;
+    line-height: 1.4;
+    word-break: break-word;
+}
+
+.audit-card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 10px 16px;
+    margin-top: 10px;
+}
+
+.audit-field {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.audit-field-label {
+    color: #64748b;
+    font-size: 0.64rem;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+
+.audit-field-value {
+    color: #e2e8f0;
+    font-size: 0.78rem;
+    word-break: break-word;
+}
+
+.audit-eta-value {
+    color: #94a3b8;
+}
+
 .audit-countdown {
     color: #67e8f9;
     font: 800 0.8rem 'JetBrains Mono', monospace;
-    white-space: nowrap;
 }
 
 .audit-countdown.is-complete {
     color: #34d399;
 }
 
-.audit-eta,
-.audit-stock-note,
 .audit-completed-at {
-    margin-top: 3px;
-    color: #64748b;
-    font-size: 0.66rem;
-    white-space: nowrap;
-}
-
-.audit-stock-note {
+    margin-top: 8px;
     color: #6ee7b7;
+    font-size: 0.68rem;
 }
 
-.audit-completed-at {
-    color: #94a3b8;
+.audit-card-actions {
+    margin-top: 10px;
+    display: flex;
+    justify-content: flex-end;
 }
 
 .audit-remove-btn {
-    border-color: rgba(248, 113, 113, 0.28);
+    border: 1px solid rgba(248, 113, 113, 0.28);
     color: #fca5a5;
+    border-radius: 8px;
+    background: rgba(15, 23, 42, 0.75);
+    padding: 7px 10px;
+    font: 700 0.7rem var(--font-body, 'Inter', sans-serif);
+    cursor: pointer;
+}
+
+.audit-remove-btn:hover {
+    border-color: rgba(248, 113, 113, 0.55);
+    color: #fecaca;
 }
 
 .audit-empty-state {
@@ -420,45 +495,23 @@
     .nav-modal-content { padding: 16px 12px; width: 96vw; }
     .kpi-cards-grid { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
 
-    /* Enable true multi-axis scrolling for Mobile */
+    /* Cards already reflow naturally on narrow screens, so no forced
+       horizontal scrolling override is needed here anymore. */
     .nav-modal-content.is-audit-wide {
         height: 92vh;
         max-height: 92vh;
     }
-    
+
     .audit-table-wrap {
         display: block;
         width: 100%;
         max-height: calc(92vh - 120px);
-        overflow-x: auto !important;
         overflow-y: auto !important;
+        overflow-x: hidden !important;
         -webkit-overflow-scrolling: touch;
     }
 
-    .audit-table {
-        display: table !important;
-        min-width: 950px !important;
-        width: max-content !important;
-    }
-
-    .audit-table thead {
-        display: table-header-group !important;
-    }
-
-    .audit-table tbody {
-        display: table-row-group !important;
-    }
-
-    .audit-table tr {
-        display: table-row !important;
-        background: transparent;
-        border: none;
-    }
-
-    .audit-table th,
-    .audit-table td {
-        display: table-cell !important;
-        white-space: nowrap !important;
-        padding: 10px 8px;
+    .audit-card-grid {
+        grid-template-columns: repeat(2, 1fr);
     }
 }

@@ -401,6 +401,12 @@
         return `${minutes}m ${seconds}s`;
     }
 
+    function formatCurrency(value) {
+        const num = Number(value);
+        if (!Number.isFinite(num) || num === 0) return "—";
+        return "₹" + num.toLocaleString("en-IN", { maximumFractionDigits: 0 });
+    }
+
     function renderAuditHistory() {
         const body = document.getElementById("nav-modal-body");
         if (!body || !currentAuditHistory.length) return;
@@ -418,39 +424,66 @@
                 </div>
             </div>
             <div class="audit-table-wrap">
-                <table class="supplier-table audit-table">
-                    <thead>
-                        <tr>
-                            <th>Timestamp</th>
-                            <th>Type</th>
-                            <th>Details</th>
-                            <th>Time remaining</th>
-                            <th>Status</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${visibleRows.map((row) => {
-                            const timing = getAuditTiming(row);
-                            const rowId = getAuditRowId(row);
-                            const isRemoved = hiddenIds.has(rowId);
-                            const status = timing.completed ? "COMPLETED" : (row.status || "APPROVED");
-                            return `
-                                <tr class="${timing.completed ? "audit-row-completed" : ""} ${isRemoved ? "audit-row-removed" : ""}">
-                                    <td>${escapeHtml(row.timestamp ? formatAuditTimestampDisplay(row.timestamp) : "Just now")}</td>
-                                    <td><b>${escapeHtml(row.auditType)}</b></td>
-                                    <td class="audit-details-cell">${formatAuditDetails(row)}</td>
-                                    <td>
-                                        <div class="audit-countdown ${timing.completed ? "is-complete" : ""}" data-completes-at="${timing.completesAt.getTime()}" data-audit-completed="${timing.completed ? "1" : "0"}">${timing.completed ? "Arrived" : formatCountdown(timing.remainingMs)}</div>
-                                        <div class="audit-eta">ETA ${escapeHtml(timing.completesAt.toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" }))}</div>
-                                    </td>
-                                    <td><span class="risk-badge badge-OPTIMAL">${escapeHtml(status)}</span>${timing.completed ? `<div class="audit-stock-note">Stock updated</div><div class="audit-completed-at">Completed ${escapeHtml(timing.completesAt.toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "medium" }))}</div>` : ""}</td>
-                                    <td>${timing.completed ? `<button class="audit-remove-btn" data-audit-action="${isRemoved ? "restore" : "remove"}" data-audit-id="${escapeHtml(rowId)}">${isRemoved ? "Restore" : "Remove"}</button>` : ""}</td>
-                                </tr>
-                            `;
-                        }).join("") || '<tr><td colspan="6" class="audit-empty-state">No visible transactions. Use “Show removed” to restore completed entries.</td></tr>'}
-                    </tbody>
-                </table>
+                <div class="audit-list">
+                    ${visibleRows.map((row) => {
+                        const timing = getAuditTiming(row);
+                        const rowId = getAuditRowId(row);
+                        const isRemoved = hiddenIds.has(rowId);
+                        const status = timing.completed ? "COMPLETED" : (row.status || "APPROVED");
+                        const isPO = row.auditType === "PURCHASE ORDER";
+
+                        const reference = isPO ? (row.po_number || "PO") : (row.transfer_id || "Transfer");
+                        const movement = isPO
+                            ? `Store ${escapeHtml(row.store_id || "—")} ← ${escapeHtml(row.supplier_name || "Supplier")}`
+                            : `${escapeHtml(row.from_store || "—")} → ${escapeHtml(row.to_store || "—")}`;
+                        const productLine = `${escapeHtml(row.product_id || "—")} — ${escapeHtml(row.product_name || "Product name unavailable")}`;
+                        const units = Number(isPO ? row.order_qty : row.transfer_qty) || 0;
+                        const cost = isPO ? formatCurrency(row.total_cost) : "—";
+
+                        return `
+                            <div class="audit-card ${timing.completed ? "audit-row-completed" : ""} ${isRemoved ? "audit-row-removed" : ""}">
+                                <div class="audit-card-top">
+                                    <div class="audit-card-type">
+                                        <span class="audit-type-badge ${isPO ? "audit-type-po" : "audit-type-transfer"}">${escapeHtml(row.auditType)}</span>
+                                        <span class="audit-card-ref">${escapeHtml(reference)}</span>
+                                    </div>
+                                    <span class="risk-badge badge-OPTIMAL">${escapeHtml(status)}</span>
+                                </div>
+                                <div class="audit-card-title">${productLine}</div>
+                                <div class="audit-card-grid">
+                                    <div class="audit-field">
+                                        <span class="audit-field-label">Created</span>
+                                        <span class="audit-field-value">${escapeHtml(row.timestamp ? formatAuditTimestampDisplay(row.timestamp) : "Just now")}</span>
+                                    </div>
+                                    <div class="audit-field">
+                                        <span class="audit-field-label">${isPO ? "Store / Supplier" : "Movement"}</span>
+                                        <span class="audit-field-value">${movement}</span>
+                                    </div>
+                                    <div class="audit-field">
+                                        <span class="audit-field-label">Units</span>
+                                        <span class="audit-field-value">${units.toLocaleString("en-IN")}</span>
+                                    </div>
+                                    <div class="audit-field">
+                                        <span class="audit-field-label">Cost</span>
+                                        <span class="audit-field-value">${cost}</span>
+                                    </div>
+                                    <div class="audit-field">
+                                        <span class="audit-field-label">${timing.completed ? "Completed" : "Time remaining"}</span>
+                                        <span class="audit-field-value">
+                                            <div class="audit-countdown ${timing.completed ? "is-complete" : ""}" data-completes-at="${timing.completesAt.getTime()}" data-audit-completed="${timing.completed ? "1" : "0"}">${timing.completed ? "Arrived" : formatCountdown(timing.remainingMs)}</div>
+                                        </span>
+                                    </div>
+                                    <div class="audit-field">
+                                        <span class="audit-field-label">ETA</span>
+                                        <span class="audit-field-value audit-eta-value">${escapeHtml(timing.completesAt.toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" }))}</span>
+                                    </div>
+                                </div>
+                                ${timing.completed ? `<div class="audit-completed-at">Stock updated · Completed ${escapeHtml(timing.completesAt.toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "medium" }))}</div>` : ""}
+                                ${timing.completed ? `<div class="audit-card-actions"><button class="audit-remove-btn" data-audit-action="${isRemoved ? "restore" : "remove"}" data-audit-id="${escapeHtml(rowId)}">${isRemoved ? "Restore" : "Remove"}</button></div>` : ""}
+                            </div>
+                        `;
+                    }).join("") || '<div class="audit-empty-state">No visible transactions. Use "Show removed" to restore completed entries.</div>'}
+                </div>
             </div>
         `;
 
@@ -526,16 +559,26 @@
         return `${date.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })} ${date.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: true })}`;
     }
 
+    function formatCostForPdf(value) {
+        // Standard PDF Helvetica font has no ₹ glyph, so use an ASCII-safe
+        // "Rs" prefix here instead of the ₹ symbol used on the web page.
+        const num = Number(value);
+        if (!Number.isFinite(num) || num === 0) return "-";
+        return "Rs " + num.toLocaleString("en-IN", { maximumFractionDigits: 0 });
+    }
+
     function createAuditTablePdf(rows, generatedAt) {
         const columns = [
-            { label: "#", width: 26 },
-            { label: "Created", width: 96 },
-            { label: "Type", width: 72 },
-            { label: "Reference", width: 92 },
-            { label: "Store movement / Supplier", width: 150 },
-            { label: "SKU / Product / Qty", width: 85 },
-            { label: "Status", width: 95 },
-            { label: "ETA / Completed", width: 155 },
+            { label: "#", width: 24 },
+            { label: "Created", width: 85 },
+            { label: "Type", width: 60 },
+            { label: "Reference", width: 80 },
+            { label: "Store movement / Supplier", width: 130 },
+            { label: "SKU / Product", width: 105 },
+            { label: "Units", width: 42 },
+            { label: "Cost", width: 52 },
+            { label: "Status", width: 80 },
+            { label: "ETA / Completed", width: 135 },
         ];
         const tableX = 35;
         const tableTop = 480;
@@ -550,21 +593,22 @@
             const createdParts = formatAuditTimestampDisplay(row.timestamp || "").split(" ");
             const completionParts = formatPdfDate(timing.completesAt).split(" ");
             const status = timing.completed ? "COMPLETED" : String(row.status || "APPROVED").replaceAll("_", " ");
-            const movement = row.auditType === "PURCHASE ORDER"
+            const isPO = row.auditType === "PURCHASE ORDER";
+            const movement = isPO
                 ? [`Store ${row.store_id || "-"}`, row.supplier_name || "Supplier"]
                 : [`${row.from_store || "-"} -> ${row.to_store || "-"}`, row.city || "Inter-store transfer"];
+            const units = Number(isPO ? row.order_qty : row.transfer_qty) || 0;
+            const cost = isPO ? formatCostForPdf(row.total_cost) : "-";
             const cells = [
                 [String(index + 1)],
                 [createdParts[0] || "Unknown", createdParts.slice(1).join(" ")],
-                wrapPdfText(row.auditType === "PURCHASE ORDER" ? "Purchase order" : "Stock transfer", 16),
-                wrapPdfText(row.po_number || row.transfer_id || "-", 20),
-                movement.flatMap((value) => wrapPdfText(value, 31)),
-                [
-                    String(row.product_id || "-"),
-                    ...wrapPdfText(row.product_name || "Product name unavailable", 20).slice(0, 2),
-                    `${Number(row.order_qty ?? row.transfer_qty) || 0} units`,
-                ],
-                wrapPdfText(status, 19),
+                wrapPdfText(isPO ? "Purchase order" : "Stock transfer", 14),
+                wrapPdfText(row.po_number || row.transfer_id || "-", 17),
+                movement.flatMap((value) => wrapPdfText(value, 26)),
+                [String(row.product_id || "-"), ...wrapPdfText(row.product_name || "Product name unavailable", 19).slice(0, 2)],
+                [String(units)],
+                [cost],
+                wrapPdfText(status, 16),
                 [timing.completed ? "Completed" : "Expected", completionParts.slice(0, 3).join(" "), completionParts.slice(3).join(" ")],
             ].map((cell) => cell.filter(Boolean).slice(0, 4));
             return { cells, completed: timing.completed, height: Math.max(39, 13 + Math.max(...cells.map((cell) => cell.length)) * lineHeight) };
@@ -606,7 +650,7 @@
                     stream += pdfRect(cellX, rowBottom, column.width, row.height, fill, "0.78 0.84 0.88");
                     const lines = row.cells[columnIndex];
                     lines.forEach((line, lineIndex) => {
-                        const isStatus = columnIndex === 6;
+                        const isStatus = columnIndex === 8;
                         const color = isStatus && row.completed ? "0.02 0.45 0.30" : "0.12 0.16 0.24";
                         stream += pdfText(line, cellX + 5, rowTop - 13 - lineIndex * lineHeight, 7.2, isStatus || columnIndex === 0, color);
                     });
@@ -681,13 +725,6 @@
         });
 
         if (transactionCompleted) renderAuditHistory();
-    }
-
-    function formatAuditDetails(row) {
-        if (row.auditType === "PURCHASE ORDER") {
-            return `${escapeHtml(row.po_number || "PO")} · Store ${escapeHtml(row.store_id || "—")} · ${escapeHtml(row.product_id || "—")} — <b>${escapeHtml(row.product_name || "Product name unavailable")}</b> · ${Number(row.order_qty) || 0} units · ${escapeHtml(row.supplier_name || "Supplier")}`;
-        }
-        return `${escapeHtml(row.transfer_id || "Transfer")} · ${escapeHtml(row.from_store || "—")} → ${escapeHtml(row.to_store || "—")} · ${escapeHtml(row.product_id || "—")} — <b>${escapeHtml(row.product_name || "Product name unavailable")}</b> · ${Number(row.transfer_qty) || 0} units`;
     }
 
     function escapeHtml(value) {
