@@ -448,18 +448,41 @@ def rank_suppliers_custom(
 # 🏬 MASTER DATA & LIVE NETWORK TELEMETRY
 # ==========================================
 
+def classify_stock_risk(current_stock, safety_stock):
+    """
+    Shared stock-risk classification, used by BOTH /api/stores (for the
+    Health Score / Reorder Alerts header stats) and /api/inventory/live
+    (for the per-SKU cards and filter pills), so the two numbers shown
+    on the same store drawer are always derived from one live rule
+    instead of drifting apart from two separate calculations.
+    """
+    if current_stock <= (safety_stock * 0.5):
+        return "CRITICAL_STOCKOUT"
+    elif current_stock <= safety_stock:
+        return "REORDER_NEEDED"
+    elif current_stock >= (safety_stock * 3.5):
+        return "OVERSTOCKED"
+    return "OPTIMAL"
+
+
 @app.get("/api/stores")
 def get_stores():
     """Returns dark store network master profiles across cities."""
     try:
         stores = dl.load_stores()
-        # Enrich with simulated live inventory health status per store
-        recs_path = os.path.join(cfg.OUTPUT_DIR, "profit_optimization_recommendations.csv")
-        reorder_counts = {}
-        if os.path.exists(recs_path):
-            rdf = pd.read_csv(recs_path)
-            reorder_counts = rdf["Store_ID"].value_counts().to_dict()
-            
+        inv = dl.load_inventory()
+
+        # Live reorder count per store: SKUs currently classified as
+        # CRITICAL_STOCKOUT or REORDER_NEEDED, using the same rule as
+        # /api/inventory/live — not a precomputed/batch file that can go
+        # stale relative to what the SKU drawer actually shows.
+        inv = inv.copy()
+        inv["Risk_State"] = inv.apply(
+            lambda row: classify_stock_risk(row["Current_Stock"], row["Safety_Stock"]), axis=1
+        )
+        needs_reorder = inv[inv["Risk_State"].isin(["CRITICAL_STOCKOUT", "REORDER_NEEDED"])]
+        reorder_counts = needs_reorder["Store_ID"].value_counts().to_dict()
+
         records = stores.to_dict(orient="records")
         for st in records:
             s_id = st["Store_ID"]
@@ -503,19 +526,10 @@ def get_live_inventory(store_id: Optional[str] = None, category: Optional[str] =
         if category and category.lower() != "all":
             merged = merged[merged["Category"].str.lower() == category.lower()]
             
-        # Classify risk state
-        def classify_stock(row):
-            curr = row["Current_Stock"]
-            safe = row["Safety_Stock"]
-            if curr <= (safe * 0.5):
-                return "CRITICAL_STOCKOUT"
-            elif curr <= safe:
-                return "REORDER_NEEDED"
-            elif curr >= (safe * 3.5):
-                return "OVERSTOCKED"
-            return "OPTIMAL"
-            
-        merged["Risk_State"] = merged.apply(classify_stock, axis=1)
+        # Classify risk state using the same shared rule as /api/stores
+        merged["Risk_State"] = merged.apply(
+            lambda row: classify_stock_risk(row["Current_Stock"], row["Safety_Stock"]), axis=1
+        )
         merged["Available_Stock"] = merged["Current_Stock"] - merged["Reserved_Stock"]
         
         return merged.fillna("").to_dict(orient="records")
