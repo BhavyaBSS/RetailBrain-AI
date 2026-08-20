@@ -36,6 +36,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Set up status poll interval (every 4 seconds)
     setInterval(checkPipelineStatus, 4000);
 
+    // Keeps operational KPIs in sync when another user dispatches a transfer.
+    setInterval(refreshLiveOperations, 10000);
+
 
     /* ==========================================================================
        NAVIGATION & TAB SWITCHING
@@ -166,6 +169,10 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (err) {
             console.error('Error fetching initial dataset:', err);
         }
+    }
+
+    async function refreshLiveOperations() {
+        await Promise.all([fetchSummary(), fetchTransfers(), fetchLiveInventory(), fetchStores()]);
     }
 
     async function fetchSummary() {
@@ -625,7 +632,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         btn.style.color = '#000';
                         btn.textContent = '✓ Truck In Transit';
                         showToast(`Truck ${data.transfer_details.transfer_id} dispatched from ${from_store} to ${to_store}!`);
-                        fetchAllData();
+                        refreshLiveOperations();
                         fetchDispatchHistory();
                     }
                 } catch (e) {
@@ -793,7 +800,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         btn.style.color = '#000';
                         btn.textContent = '✓ Dispatched to ERP';
                         showToast(`PO ${data.order_details.po_number} sent to ${supplier_name}!`);
-                        fetchAllData();
+                        refreshLiveOperations();
                         fetchDispatchHistory();
                     }
                 } catch (e) {
@@ -829,7 +836,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         btn.style.color = '#000';
                         btn.textContent = '✓ Truck In Transit';
                         showToast(`Truck ${data.transfer_details.transfer_id} dispatched from ${from_store}!`);
-                        fetchAllData();
+                        refreshLiveOperations();
                         fetchDispatchHistory();
                     }
                 } catch (e) {

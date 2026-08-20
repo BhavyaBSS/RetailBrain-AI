@@ -175,6 +175,53 @@ def get_stock_transfers() -> List[Dict[str, Any]]:
             return [dict(row) for row in cur.fetchall()]
 
 
+def record_stock_transfer_and_update_inventory(entry: Dict[str, Any]) -> None:
+    """Persist a transfer and both stock movements as one transaction."""
+    with get_conn() as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                SELECT current_stock FROM inventory
+                WHERE store_id = %s AND product_id = %s FOR UPDATE
+                """,
+                (entry["from_store"], entry["product_id"]),
+            )
+            source_row = cur.fetchone()
+            if source_row is None:
+                raise ValueError("Source store inventory record was not found.")
+            if source_row[0] < entry["transfer_qty"]:
+                raise ValueError("Source store does not have enough stock for this transfer.")
+
+            cur.execute(
+                """
+                INSERT INTO stock_transfers
+                    (transfer_id, ts, from_store, to_store, product_id,
+                     transfer_qty, city, status, eta_text, distance_km,
+                     eta_minutes, eta_at)
+                VALUES (%(transfer_id)s, %(ts)s, %(from_store)s, %(to_store)s,
+                        %(product_id)s, %(transfer_qty)s, %(city)s, %(status)s,
+                        %(eta_text)s, %(distance_km)s, %(eta_minutes)s, %(eta_at)s)
+                """,
+                entry,
+            )
+            cur.execute(
+                """
+                UPDATE inventory SET current_stock = current_stock - %s
+                WHERE store_id = %s AND product_id = %s
+                """,
+                (entry["transfer_qty"], entry["from_store"], entry["product_id"]),
+            )
+            cur.execute(
+                """
+                INSERT INTO inventory (store_id, product_id, current_stock)
+                VALUES (%s, %s, %s)
+                ON CONFLICT (store_id, product_id) DO UPDATE
+                SET current_stock = inventory.current_stock + EXCLUDED.current_stock
+                """,
+                (entry["to_store"], entry["product_id"], entry["transfer_qty"]),
+            )
+
+
 def mark_all_completed() -> None:
     """Mirrors the old mark_history_completed() CSV behavior."""
     with get_conn() as conn:

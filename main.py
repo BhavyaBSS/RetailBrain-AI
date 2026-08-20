@@ -263,11 +263,11 @@ def run_pipeline_worker():
 
 @app.get("/api/summary", response_model=Dict[str, Any])
 def get_summary():
-    """Returns general executive KPIs and model performance statistics."""
+    """Returns executive KPIs, with inventory operations derived live."""
     summary_path = os.path.join(cfg.OUTPUT_DIR, "dashboard_summary.json")
     if not os.path.exists(summary_path):
-        # Fallback if outputs haven't been computed yet
-        return {
+        # Historical/model values have no live source; inventory values below do.
+        summary = {
             "total_stores": 100,
             "total_products": 35,
             "total_historical_revenue": 345000000.0,
@@ -281,13 +281,21 @@ def get_summary():
             "forecast_model_wape_festival_days": 0.11350,
             "forecast_model_wape_normal_days": 0.09762
         }
-    
-    try:
-        with open(summary_path, "r", encoding="utf-8") as f:
-            return json.load(f)
-    except Exception as e:
-        logger.error(f"Error reading dashboard summary: {e}")
-        raise HTTPException(status_code=500, detail="Error reading dashboard summary.")
+    else:
+        try:
+            with open(summary_path, "r", encoding="utf-8") as f:
+                summary = json.load(f)
+        except Exception as e:
+            logger.error(f"Error reading dashboard summary: {e}")
+            raise HTTPException(status_code=500, detail="Error reading dashboard summary.")
+
+    operational = _get_live_operational_inventory()
+    summary.update({
+        "combos_needing_reorder": operational["reorder_count"],
+        "combos_overstocked": operational["overstock_count"],
+        "stock_transfer_recommendations": len(operational["transfers"]),
+    })
+    return summary
 
 
 @app.get("/api/recommendations")
@@ -328,13 +336,9 @@ def get_recommendations(
 
 @app.get("/api/transfers")
 def get_transfers(city: Optional[str] = None, product: Optional[str] = None):
-    """Returns inter-store stock transfer recommendations."""
-    transfers_path = os.path.join(cfg.OUTPUT_DIR, "stock_transfer_recommendations.csv")
-    if not os.path.exists(transfers_path):
-        raise HTTPException(status_code=404, detail="Stock transfers recommendations not found.")
-    
+    """Returns live inter-store stock transfer recommendations."""
     try:
-        df = pd.read_csv(transfers_path)
+        df = _get_live_operational_inventory()["transfers"]
         if city and city.lower() != "all":
             df = df[df["City"].str.lower() == city.lower()]
         if product and product.lower() != "all":
@@ -463,6 +467,57 @@ def classify_stock_risk(current_stock, safety_stock):
     elif current_stock >= (safety_stock * 3.5):
         return "OVERSTOCKED"
     return "OPTIMAL"
+
+
+def _get_live_operational_inventory() -> Dict[str, Any]:
+    """Build live inventory KPIs and transfer actions from current stock."""
+    inventory = dl.load_inventory().copy()
+    stores = dl.load_stores()[["Store_ID", "City"]]
+    inventory["Available_Stock"] = (
+        inventory["Current_Stock"] - inventory["Reserved_Stock"]
+    ).clip(lower=0)
+    inventory["Risk_State"] = inventory.apply(
+        lambda row: classify_stock_risk(row["Current_Stock"], row["Safety_Stock"]), axis=1
+    )
+    inventory = inventory.merge(stores, on="Store_ID", how="left")
+
+    transfers = []
+    for (product_id, city), group in inventory.groupby(["Product_ID", "City"], dropna=False):
+        donors = group[group["Risk_State"] == "OVERSTOCKED"].copy()
+        recipients = group[group["Risk_State"].isin(["CRITICAL_STOCKOUT", "REORDER_NEEDED"])].copy()
+        if donors.empty or recipients.empty:
+            continue
+
+        donors["available_qty"] = (donors["Available_Stock"] - donors["Safety_Stock"]).clip(lower=0)
+        recipients["needed_qty"] = (recipients["Safety_Stock"] - recipients["Available_Stock"]).clip(lower=0)
+        donors = donors.sort_values("available_qty", ascending=False).reset_index(drop=True)
+        recipients = recipients.sort_values("needed_qty", ascending=False).reset_index(drop=True)
+        donor_index = recipient_index = 0
+        donor_pool = donors["available_qty"].tolist()
+        recipient_pool = recipients["needed_qty"].tolist()
+
+        while donor_index < len(donor_pool) and recipient_index < len(recipient_pool):
+            quantity = int(min(donor_pool[donor_index], recipient_pool[recipient_index]))
+            if quantity > 0:
+                transfers.append({
+                    "Product_ID": product_id,
+                    "City": city or "Unknown",
+                    "From_Store": donors.loc[donor_index, "Store_ID"],
+                    "To_Store": recipients.loc[recipient_index, "Store_ID"],
+                    "Transfer_Qty": quantity,
+                })
+            donor_pool[donor_index] -= quantity
+            recipient_pool[recipient_index] -= quantity
+            if donor_pool[donor_index] <= 0:
+                donor_index += 1
+            if recipient_pool[recipient_index] <= 0:
+                recipient_index += 1
+
+    return {
+        "reorder_count": int(inventory["Risk_State"].isin(["CRITICAL_STOCKOUT", "REORDER_NEEDED"]).sum()),
+        "overstock_count": int((inventory["Risk_State"] == "OVERSTOCKED").sum()),
+        "transfers": pd.DataFrame(transfers, columns=["Product_ID", "City", "From_Store", "To_Store", "Transfer_Qty"]),
+    }
 
 
 @app.get("/api/stores")
@@ -762,7 +817,7 @@ def approve_stock_transfer(
     city: str = Body(..., embed=True)
 ):
     """
-    Approves an inter-store stock transfer, writes to history CSV, and adjusts the local inventory dataset.
+    Approves an inter-store stock transfer and updates database inventory atomically.
     """
     transfer_id = f"TRK-{city[:3].upper()}-{random.randint(1000, 9999)}"
     transaction_time = datetime.now(IST)
@@ -787,8 +842,8 @@ def approve_stock_transfer(
         "eta_at": eta_time.isoformat()
     }
 
-    # Persist action to the database (survives restarts, synced across every device)
-    db.insert_stock_transfer({
+    # Persist the action and both stock movements together.
+    db_entry = {
         "transfer_id": transfer_id,
         "ts": transaction_time,
         "from_store": from_store,
@@ -801,11 +856,11 @@ def approve_stock_transfer(
         "distance_km": eta_result["distance_km"],
         "eta_minutes": eta_result["duration_minutes"],
         "eta_at": eta_time,
-    })
-
-    # Decrement at source store, increment at destination store
-    db.update_inventory_stock(from_store, product_id, -transfer_qty)
-    db.update_inventory_stock(to_store, product_id, transfer_qty)
+    }
+    try:
+        db.record_stock_transfer_and_update_inventory(db_entry)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
     
     logger.info(f"CENTRAL ACTION: Stock Transfer {transfer_id} approved from {from_store} -> {to_store}")
     return {
