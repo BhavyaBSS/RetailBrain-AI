@@ -27,6 +27,7 @@ from fastapi.responses import FileResponse, PlainTextResponse
 from src import config as cfg
 from src import data_loader as dl
 from src import traffic_eta
+from src import db
 
 
 
@@ -48,6 +49,22 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.on_event("startup")
+def _init_database():
+    """Creates the Postgres tables (if missing) on startup. Logs a clear
+    warning instead of crashing if DATABASE_URL isn't set yet, so the app
+    still runs for local dev without a database configured."""
+    if db.is_configured():
+        try:
+            db.init_schema()
+        except Exception as e:
+            logger.error(f"Failed to initialize database schema: {e}")
+    else:
+        logger.warning(
+            "DATABASE_URL is not set — purchase orders, stock transfers, and "
+            "inventory updates will NOT persist across restarts."
+        )
 
 # Global process tracker for pipeline execution
 pipeline_state = {
@@ -695,12 +712,24 @@ def approve_purchase_order(
             transaction_time + timedelta(days=lead_days)
         ).isoformat()
     }
-    
-    # Persist action to CSV log
-    append_csv_history(cfg.PURCHASE_ORDERS_FILE, dispatch_entry)
-    
-    # Update inventory.csv stock levels
-    update_inventory_stock(store_id, product_id, order_qty)
+
+    # Persist action to the database (survives restarts, synced across every device)
+    db.insert_purchase_order({
+        "po_number": po_number,
+        "ts": transaction_time,
+        "store_id": store_id,
+        "product_id": product_id,
+        "supplier_name": supplier_name,
+        "order_qty": order_qty,
+        "total_cost": total_cost,
+        "status": "DISPATCHED_TO_SUPPLIER",
+        "estimated_delivery": transaction_time + timedelta(days=lead_days),
+        "transit_minutes": eta_result["transit_minutes"],
+        "distance_km": eta_result["distance_km"],
+    })
+
+    # Update live inventory stock levels in the database
+    db.update_inventory_stock(store_id, product_id, order_qty)
     
     logger.info(f"CENTRAL ACTION: Purchase Order {po_number} approved for Store {store_id}, Product {product_id}")
     return {
@@ -743,13 +772,26 @@ def approve_stock_transfer(
         "eta_minutes": eta_result["duration_minutes"],
         "eta_at": eta_time.isoformat()
     }
-    
-    # Persist action to CSV log
-    append_csv_history(cfg.STOCK_TRANSFERS_FILE, transfer_entry)
-    
-    # Decrement at source store, increment at destination store in inventory.csv
-    update_inventory_stock(from_store, product_id, -transfer_qty)
-    update_inventory_stock(to_store, product_id, transfer_qty)
+
+    # Persist action to the database (survives restarts, synced across every device)
+    db.insert_stock_transfer({
+        "transfer_id": transfer_id,
+        "ts": transaction_time,
+        "from_store": from_store,
+        "to_store": to_store,
+        "product_id": product_id,
+        "transfer_qty": transfer_qty,
+        "city": city,
+        "status": "IN_TRANSIT",
+        "eta_text": traffic_eta.format_eta_for_log(eta_result),
+        "distance_km": eta_result["distance_km"],
+        "eta_minutes": eta_result["duration_minutes"],
+        "eta_at": eta_time,
+    })
+
+    # Decrement at source store, increment at destination store
+    db.update_inventory_stock(from_store, product_id, -transfer_qty)
+    db.update_inventory_stock(to_store, product_id, transfer_qty)
     
     logger.info(f"CENTRAL ACTION: Stock Transfer {transfer_id} approved from {from_store} -> {to_store}")
     return {
@@ -761,15 +803,54 @@ def approve_stock_transfer(
 
 @app.get("/api/action/dispatch-history")
 def get_dispatch_history():
-    """Returns audit log of all Central Manager actions executed from persistent CSV files."""
-    pos = load_csv_history(cfg.PURCHASE_ORDERS_FILE)
-    transfers = load_csv_history(cfg.STOCK_TRANSFERS_FILE)
-    pos_sorted = sorted(pos, key=lambda x: x.get("timestamp", ""), reverse=True)
-    transfers_sorted = sorted(transfers, key=lambda x: x.get("timestamp", ""), reverse=True)
+    """Returns audit log of all Central Manager actions, read from the database
+    so every device sees the same, persisted data."""
+    pos = db.get_purchase_orders()
+    transfers = db.get_stock_transfers()
+
+    def _iso(row, keys):
+        for k in keys:
+            if row.get(k) is not None and hasattr(row[k], "isoformat"):
+                row[k] = row[k].isoformat()
+        return row
+
+    pos = [_iso(dict(r), ["ts", "estimated_delivery"]) for r in pos]
+    transfers = [_iso(dict(r), ["ts", "eta_at"]) for r in transfers]
+
+    # Rename DB columns back to the field names the frontend already expects
+    for r in pos:
+        r["timestamp"] = r.pop("ts", None)
+        r["eta"] = None  # POs don't use the transfer-style eta text field
+    for r in transfers:
+        r["timestamp"] = r.pop("ts", None)
+        r["eta"] = r.pop("eta_text", None)
+
     return {
-        "purchase_orders": pos_sorted,
-        "stock_transfers": transfers_sorted
+        "purchase_orders": pos,
+        "stock_transfers": transfers
     }
+
+
+@app.get("/api/action/hidden-rows")
+def get_hidden_rows():
+    """Returns the set of audit-log row IDs dismissed ('Removed') by any
+    device. Synced across devices instead of living in one browser's
+    localStorage."""
+    return {"hidden_ids": db.get_hidden_row_ids()}
+
+
+@app.post("/api/action/hidden-rows")
+def set_hidden_row(
+    row_id: str = Body(..., embed=True),
+    hidden: bool = Body(..., embed=True),
+):
+    """Marks a row as removed/restored. Any device calling this changes what
+    every other device sees on next refresh."""
+    if hidden:
+        db.hide_row(row_id)
+    else:
+        db.unhide_row(row_id)
+    return {"success": True, "row_id": row_id, "hidden": hidden}
 
 
 # ==========================================
@@ -824,7 +905,10 @@ def ingest_new_data(
             
         # If new inventory dataset is uploaded, consider all previous actions COMPLETED
         if target_dataset == "inventory":
-            mark_history_completed()
+            if db.is_configured():
+                db.mark_all_completed()
+            else:
+                mark_history_completed()
             logger.info("New inventory snapshot uploaded. Existing pending transfers and POs marked as COMPLETED.")
             
         retrain_status = "Not triggered"

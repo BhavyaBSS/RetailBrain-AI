@@ -2,11 +2,12 @@
  * RetailBrain AI — Phase 11 Global Navigation Header & Command Modals
  */
 (function () {
-    const hiddenAuditStorageKey = "retailbrain-hidden-completed-audits";
+    const hiddenAuditStorageKey = "retailbrain-hidden-completed-audits"; // legacy key, kept only for one-time migration below
     let auditCountdownTimer = null;
     let auditRefreshTimer = null;
     let currentAuditHistory = [];
     let showRemovedAuditRows = false;
+    let hiddenAuditIdsCache = new Set();
 
     function initGlobalNav() {
         const rightContainer = document.getElementById("header-nav-right");
@@ -150,7 +151,14 @@
             fetch("/api/products")
                 .then((res) => requireSuccessfulResponse(res, "Product catalogue"))
                 .catch(() => []),
-        ]).then(([data, products]) => {
+            fetch("/api/action/hidden-rows")
+                .then((res) => requireSuccessfulResponse(res, "Hidden rows"))
+                .catch(() => ({ hidden_ids: [] })),
+        ]).then(([data, products, hiddenData]) => {
+            hiddenAuditIdsCache = new Set(
+                (Array.isArray(hiddenData && hiddenData.hidden_ids) ? hiddenData.hidden_ids : []).map(String)
+            );
+
             const productNames = new Map(
                 (Array.isArray(products) ? products : []).map((product) => [
                     String(product.Product_ID),
@@ -289,20 +297,40 @@
     }
 
     function getHiddenAuditIds() {
+        return hiddenAuditIdsCache;
+    }
+
+    function migrateLegacyLocalHiddenIdsOnce() {
+        // One-time: if this browser has old localStorage-only hidden rows
+        // from before syncing existed, push them to the server so they
+        // aren't silently lost, then clear the local copy.
         try {
-            const stored = JSON.parse(localStorage.getItem(hiddenAuditStorageKey) || "[]");
-            return new Set(Array.isArray(stored) ? stored.map(String) : []);
+            const raw = localStorage.getItem(hiddenAuditStorageKey);
+            if (!raw) return Promise.resolve();
+            const legacyIds = JSON.parse(raw);
+            if (!Array.isArray(legacyIds) || !legacyIds.length) {
+                localStorage.removeItem(hiddenAuditStorageKey);
+                return Promise.resolve();
+            }
+            return Promise.all(
+                legacyIds.map((id) => persistHiddenRowChange(String(id), true))
+            ).then(() => {
+                localStorage.removeItem(hiddenAuditStorageKey);
+            });
         } catch (error) {
-            return new Set();
+            console.warn("Could not migrate legacy local hidden audit rows:", error);
+            return Promise.resolve();
         }
     }
 
-    function saveHiddenAuditIds(ids) {
-        try {
-            localStorage.setItem(hiddenAuditStorageKey, JSON.stringify([...ids]));
-        } catch (error) {
-            console.warn("Could not save hidden audit rows:", error);
-        }
+    function persistHiddenRowChange(rowId, hidden) {
+        return fetch("/api/action/hidden-rows", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ row_id: rowId, hidden }),
+        }).catch((error) => {
+            console.warn("Could not sync hidden row change to server:", error);
+        });
     }
 
     function getAuditTiming(row, now = new Date()) {
@@ -436,11 +464,13 @@
                 downloadAuditPdf();
                 return;
             } else {
-                const ids = getHiddenAuditIds();
                 const rowId = button.getAttribute("data-audit-id");
-                if (action === "remove") ids.add(rowId);
-                if (action === "restore") ids.delete(rowId);
-                saveHiddenAuditIds(ids);
+                const nowHidden = action === "remove";
+                if (nowHidden) hiddenAuditIdsCache.add(rowId);
+                else hiddenAuditIdsCache.delete(rowId);
+                // Optimistic UI update, then sync to the server so every
+                // other device sees this same change on next refresh.
+                persistHiddenRowChange(rowId, nowHidden);
             }
             renderAuditHistory();
         };
@@ -796,8 +826,12 @@
         if (backdrop) backdrop.classList.remove("is-open");
     }
 
-    window.addEventListener("DOMContentLoaded", initGlobalNav);
+    window.addEventListener("DOMContentLoaded", () => {
+        initGlobalNav();
+        migrateLegacyLocalHiddenIdsOnce();
+    });
     if (document.readyState === "complete" || document.readyState === "interactive") {
         initGlobalNav();
+        migrateLegacyLocalHiddenIdsOnce();
     }
 })();

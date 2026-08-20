@@ -7,6 +7,7 @@ import os
 import pandas as pd
 from typing import Dict
 from . import config as cfg
+from . import db
 
 # Set up logger
 logger = logging.getLogger("RetailBrain_AI.DataLoader")
@@ -48,11 +49,38 @@ def load_stores() -> pd.DataFrame:
 
 
 def load_inventory() -> pd.DataFrame:
-    """Loads the store x product inventory snapshots."""
+    """Loads the store x product inventory snapshot.
+
+    Reads from the database when DATABASE_URL is configured (live, current
+    stock levels, shared across every device), and falls back to the
+    original inventory.csv only when no database is set up (e.g. local dev).
+    """
+    if db.is_configured():
+        try:
+            rows = db.get_inventory()
+            df = pd.DataFrame(rows)
+            if df.empty:
+                # No inventory rows in the DB yet (fresh setup, migration not run).
+                # Fall back to CSV so the app still has something to work with.
+                logger.warning("Inventory table is empty in the database; falling back to inventory.csv")
+            else:
+                df = df.rename(columns={
+                    "store_id": "Store_ID",
+                    "product_id": "Product_ID",
+                    "current_stock": "Current_Stock",
+                    "reserved_stock": "Reserved_Stock",
+                    "safety_stock": "Safety_Stock",
+                    "maximum_capacity": "Maximum_Capacity",
+                })
+                logger.info(f"Successfully loaded inventory from database: {len(df)} records")
+                return df
+        except Exception as e:
+            logger.error(f"Failed to load inventory from database, falling back to CSV: {e}")
+
     _verify_file_exists(cfg.INVENTORY_FILE, "inventory")
     try:
         df = pd.read_csv(cfg.INVENTORY_FILE)
-        logger.info(f"Successfully loaded inventory snapshot: {len(df)} records")
+        logger.info(f"Successfully loaded inventory snapshot from CSV: {len(df)} records")
         return df
     except Exception as e:
         logger.exception("Failed to parse inventory CSV")
