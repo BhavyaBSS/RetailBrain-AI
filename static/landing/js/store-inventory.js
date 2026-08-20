@@ -127,6 +127,10 @@
 
         document.getElementById("drawer-store-name").textContent = store.Store_Name;
         document.getElementById("drawer-store-locality").textContent = `${store.Locality}, ${store.City}`;
+        // Show the last-known values immediately so the drawer isn't blank
+        // while data loads, but these get overwritten below with live
+        // numbers computed from the actual SKU data — never left stale
+        // after a transfer/purchase changes stock.
         document.getElementById("drawer-stat-health").textContent = `${store.health_score ?? 100}%`;
         document.getElementById("drawer-stat-alerts").textContent = store.reorder_alerts_count || 0;
 
@@ -140,6 +144,20 @@
             .then((data) => {
                 storeInventoryData = data;
                 document.getElementById("drawer-stat-total-skus").textContent = data.length;
+
+                // Compute Health Score / Reorder Alerts directly from this
+                // same live SKU list, instead of trusting the store object's
+                // (possibly stale) precomputed values. This guarantees the
+                // header always matches what the SKU cards below actually
+                // show, and updates correctly right after any transfer or
+                // purchase order changes stock.
+                const needsReorderCount = data.filter(
+                    (item) => item.Risk_State === "CRITICAL_STOCKOUT" || item.Risk_State === "REORDER_NEEDED"
+                ).length;
+                const liveHealthScore = Math.max(60, 100 - (needsReorderCount * 2));
+                document.getElementById("drawer-stat-alerts").textContent = needsReorderCount;
+                document.getElementById("drawer-stat-health").textContent = `${liveHealthScore}%`;
+
                 renderSKUGrid();
             })
             .catch((err) => {
