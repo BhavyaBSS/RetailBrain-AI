@@ -37,7 +37,9 @@ document.addEventListener('DOMContentLoaded', () => {
     setInterval(checkPipelineStatus, 4000);
 
     // Keeps operational KPIs in sync when another user dispatches a transfer.
-    setInterval(refreshLiveOperations, 10000);
+    setInterval(() => {
+        if (!document.hidden) refreshLiveOperations();
+    }, 10000);
 
 
     /* ==========================================================================
@@ -137,6 +139,10 @@ document.addEventListener('DOMContentLoaded', () => {
         // Refresh tab specific rendering if needed
         if (tabId === 'suppliers') {
             fetchSupplierCompare();
+        } else if (tabId === 'inventory') {
+            renderInventoryTable(state.liveInventory);
+            renderTransfersTable(state.transfersData);
+            refreshLiveOperations();
         } else if (tabId === 'forecasts') {
             loadForecastChartData();
         } else if (tabId === 'console') {
@@ -172,7 +178,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function refreshLiveOperations() {
-        await Promise.all([fetchSummary(), fetchTransfers(), fetchLiveInventory(), fetchStores()]);
+        const requests = [fetchSummary(), fetchTransfers()];
+        if (state.activeTab === 'inventory') {
+            requests.push(fetchLiveInventory(), fetchStores());
+        }
+        await Promise.all(requests);
     }
 
     async function fetchSummary() {
@@ -204,7 +214,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const res = await fetch('/api/transfers');
             if (res.ok) {
                 state.transfersData = await res.json();
-                renderTransfersTable(state.transfersData);
+                if (state.activeTab === 'inventory') renderTransfersTable(state.transfersData);
             }
         } catch (e) {
             console.error('Transfers fetch error:', e);
@@ -238,7 +248,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const res = await fetch('/api/inventory/live');
             if (res.ok) {
                 state.liveInventory = await res.json();
-                renderInventoryTable(state.liveInventory);
+                if (state.activeTab === 'inventory') renderInventoryTable(state.liveInventory);
             }
         } catch (e) {
             console.error('Live inventory fetch error:', e);
@@ -270,8 +280,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 kpiWapeDetail.textContent = `WAPE: ${(wape * 100).toFixed(2)}% (MAE: 1.05 units)`;
             }
         }
-        const reordersCount = summary.combos_needing_reorder || 1394;
-        const transfersCount = summary.stock_transfer_recommendations || 303;
+        const reordersCount = summary.combos_needing_reorder ?? 1394;
+        const transfersCount = summary.stock_transfer_recommendations ?? 303;
         
         if (kpiReorders) kpiReorders.textContent = reordersCount.toLocaleString();
         if (kpiTransfers) kpiTransfers.textContent = transfersCount.toLocaleString();

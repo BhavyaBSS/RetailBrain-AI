@@ -4,6 +4,7 @@ Loads and lightly type-casts all six source tables with robust error handling.
 """
 import logging
 import os
+from functools import lru_cache
 import pandas as pd
 from typing import Dict
 from . import config as cfg
@@ -12,6 +13,16 @@ from . import db
 # Set up logger
 logger = logging.getLogger("RetailBrain_AI.DataLoader")
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
+
+
+@lru_cache(maxsize=8)
+def _load_reference_csv(filepath: str, modified_ns: int) -> pd.DataFrame:
+    """Cache immutable reference CSVs until their source file changes."""
+    return pd.read_csv(filepath)
+
+
+def _load_cached_reference(filepath: str) -> pd.DataFrame:
+    return _load_reference_csv(filepath, os.stat(filepath).st_mtime_ns).copy()
 
 
 def _verify_file_exists(filepath: str, name: str) -> None:
@@ -28,7 +39,7 @@ def load_products() -> pd.DataFrame:
     """Loads the products SKU catalog."""
     _verify_file_exists(cfg.PRODUCTS_FILE, "products")
     try:
-        df = pd.read_csv(cfg.PRODUCTS_FILE)
+        df = _load_cached_reference(cfg.PRODUCTS_FILE)
         logger.info(f"Successfully loaded products: {len(df)} SKUs")
         return df
     except Exception as e:
@@ -40,7 +51,7 @@ def load_stores() -> pd.DataFrame:
     """Loads the store locations catalog."""
     _verify_file_exists(cfg.STORES_FILE, "stores")
     try:
-        df = pd.read_csv(cfg.STORES_FILE)
+        df = _load_cached_reference(cfg.STORES_FILE)
         logger.info(f"Successfully loaded stores: {len(df)} locations")
         return df
     except Exception as e:
@@ -79,7 +90,7 @@ def load_inventory() -> pd.DataFrame:
 
     _verify_file_exists(cfg.INVENTORY_FILE, "inventory")
     try:
-        df = pd.read_csv(cfg.INVENTORY_FILE)
+        df = _load_cached_reference(cfg.INVENTORY_FILE)
         logger.info(f"Successfully loaded inventory snapshot from CSV: {len(df)} records")
         return df
     except Exception as e:
@@ -91,7 +102,7 @@ def load_suppliers() -> pd.DataFrame:
     """Loads the supplier price & lead time offers list."""
     _verify_file_exists(cfg.SUPPLIERS_FILE, "suppliers")
     try:
-        df = pd.read_csv(cfg.SUPPLIERS_FILE)
+        df = _load_cached_reference(cfg.SUPPLIERS_FILE)
         logger.info(f"Successfully loaded supplier offers: {len(df)} records")
         return df
     except Exception as e:

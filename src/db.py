@@ -27,10 +27,14 @@ from typing import Any, Dict, List, Optional
 
 import psycopg2
 import psycopg2.extras
+from psycopg2.pool import ThreadedConnectionPool
+from threading import Lock
 
 logger = logging.getLogger("RetailBrain_AI.DB")
 
 DATABASE_URL = os.environ.get("DATABASE_URL", "")
+_connection_pool: Optional[ThreadedConnectionPool] = None
+_pool_lock = Lock()
 
 
 def is_configured() -> bool:
@@ -44,7 +48,12 @@ def get_conn():
             "DATABASE_URL is not set. Add it in Render's Environment tab "
             "(and your local .env) to enable persistent storage."
         )
-    conn = psycopg2.connect(DATABASE_URL)
+    global _connection_pool
+    with _pool_lock:
+        if _connection_pool is None:
+            _connection_pool = ThreadedConnectionPool(1, 4, DATABASE_URL)
+
+    conn = _connection_pool.getconn()
     try:
         yield conn
         conn.commit()
@@ -52,7 +61,16 @@ def get_conn():
         conn.rollback()
         raise
     finally:
-        conn.close()
+        _connection_pool.putconn(conn)
+
+
+def close_pool() -> None:
+    """Release pooled connections during application shutdown."""
+    global _connection_pool
+    with _pool_lock:
+        if _connection_pool is not None:
+            _connection_pool.closeall()
+            _connection_pool = None
 
 
 # ---------------------------------------------------------------------------

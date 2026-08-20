@@ -10,6 +10,7 @@ import subprocess
 import time
 import random
 import io
+from threading import Lock
 
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
@@ -66,6 +67,11 @@ def _init_database():
             "inventory updates will NOT persist across restarts."
         )
 
+
+@app.on_event("shutdown")
+def _close_database_pool():
+    db.close_pool()
+
 # Global process tracker for pipeline execution
 pipeline_state = {
     "is_running": False,
@@ -74,6 +80,8 @@ pipeline_state = {
     "exit_code": None,
     "log_file": os.path.join(cfg.OUTPUT_DIR, "pipeline_run.log")
 }
+live_operations_cache = {"value": None, "expires_at": 0.0}
+live_operations_lock = Lock()
 
 # Define schema validation configurations
 SCHEMAS = {
@@ -469,15 +477,41 @@ def classify_stock_risk(current_stock, safety_stock):
     return "OPTIMAL"
 
 
+def invalidate_live_operations_cache() -> None:
+    with live_operations_lock:
+        live_operations_cache["value"] = None
+        live_operations_cache["expires_at"] = 0.0
+
+
 def _get_live_operational_inventory() -> Dict[str, Any]:
     """Build live inventory KPIs and transfer actions from current stock."""
+    now = time.monotonic()
+    with live_operations_lock:
+        cached = live_operations_cache["value"]
+        if cached is not None and now < live_operations_cache["expires_at"]:
+            return cached
+
+        result = _build_live_operational_inventory()
+        live_operations_cache["value"] = result
+        live_operations_cache["expires_at"] = now + 1.0
+        return result
+
+
+def _build_live_operational_inventory() -> Dict[str, Any]:
+    """Build the live inventory snapshot used by operational KPI endpoints."""
     inventory = dl.load_inventory().copy()
     stores = dl.load_stores()[["Store_ID", "City"]]
     inventory["Available_Stock"] = (
         inventory["Current_Stock"] - inventory["Reserved_Stock"]
     ).clip(lower=0)
-    inventory["Risk_State"] = inventory.apply(
-        lambda row: classify_stock_risk(row["Current_Stock"], row["Safety_Stock"]), axis=1
+    inventory["Risk_State"] = np.select(
+        [
+            inventory["Current_Stock"] <= inventory["Safety_Stock"] * 0.5,
+            inventory["Current_Stock"] <= inventory["Safety_Stock"],
+            inventory["Current_Stock"] >= inventory["Safety_Stock"] * 3.5,
+        ],
+        ["CRITICAL_STOCKOUT", "REORDER_NEEDED", "OVERSTOCKED"],
+        default="OPTIMAL",
     )
     inventory = inventory.merge(stores, on="Store_ID", how="left")
 
@@ -799,6 +833,7 @@ def approve_purchase_order(
 
     # Update live inventory stock levels in the database
     db.update_inventory_stock(store_id, product_id, order_qty)
+    invalidate_live_operations_cache()
     
     logger.info(f"CENTRAL ACTION: Purchase Order {po_number} approved for Store {store_id}, Product {product_id}")
     return {
@@ -861,6 +896,7 @@ def approve_stock_transfer(
         db.record_stock_transfer_and_update_inventory(db_entry)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
+    invalidate_live_operations_cache()
     
     logger.info(f"CENTRAL ACTION: Stock Transfer {transfer_id} approved from {from_store} -> {to_store}")
     return {
@@ -979,6 +1015,7 @@ def ingest_new_data(
             else:
                 mark_history_completed()
             logger.info("New inventory snapshot uploaded. Existing pending transfers and POs marked as COMPLETED.")
+        invalidate_live_operations_cache()
             
         retrain_status = "Not triggered"
         if auto_trigger_retrain and not pipeline_state["is_running"]:
