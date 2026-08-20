@@ -15,6 +15,8 @@ document.addEventListener('DOMContentLoaded', () => {
         storesData: [],
         productsData: [],
         liveInventory: [],
+        liveInventorySearch: [],
+        transfersSearch: [],
         charts: {},
         isPipelineRunning: false
     };
@@ -214,6 +216,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const res = await fetch('/api/transfers');
             if (res.ok) {
                 state.transfersData = await res.json();
+                state.transfersSearch = state.transfersData.map(transfer => ({
+                    ...transfer,
+                    searchText: [transfer.Product_ID, transfer.From_Store, transfer.To_Store, transfer.City]
+                        .filter(Boolean)
+                        .join(' ')
+                        .toLowerCase()
+                }));
                 if (state.activeTab === 'inventory') renderTransfersTable(state.transfersData);
             }
         } catch (e) {
@@ -248,6 +257,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const res = await fetch('/api/inventory/live');
             if (res.ok) {
                 state.liveInventory = await res.json();
+                state.liveInventorySearch = state.liveInventory.map(item => ({
+                    ...item,
+                    searchText: [item.Product_Name, item.Product_ID, item.Store_Name, item.Store_ID, item.City]
+                        .filter(Boolean)
+                        .join(' ')
+                        .toLowerCase()
+                }));
                 if (state.activeTab === 'inventory') renderInventoryTable(state.liveInventory);
             }
         } catch (e) {
@@ -733,38 +749,33 @@ document.addEventListener('DOMContentLoaded', () => {
             const city = transferCityEl ? transferCityEl.value : 'all';
 
             // Filter Live Inventory Table
-            let filteredInv = state.liveInventory;
+            let filteredInv = state.liveInventorySearch;
             if (risk !== 'all') filteredInv = filteredInv.filter(i => (i.Risk_State || 'OPTIMAL') === risk);
             if (store !== 'all') filteredInv = filteredInv.filter(i => i.Store_ID === store);
             if (cat !== 'all') filteredInv = filteredInv.filter(i => i.Category === cat);
             if (city !== 'all') filteredInv = filteredInv.filter(i => (i.City || '').toLowerCase() === city.toLowerCase());
             if (q) {
-                filteredInv = filteredInv.filter(i => 
-                    (i.Product_Name || '').toLowerCase().includes(q) ||
-                    (i.Product_ID || '').toLowerCase().includes(q) ||
-                    (i.Store_Name || '').toLowerCase().includes(q) ||
-                    (i.Store_ID || '').toLowerCase().includes(q) ||
-                    (i.City || '').toLowerCase().includes(q)
-                );
+                filteredInv = filteredInv.filter(i => i.searchText.includes(q));
             }
             renderInventoryTable(filteredInv);
 
             // Filter Stock Transfers Table
-            let filteredTransfers = state.transfersData;
+            let filteredTransfers = state.transfersSearch;
             if (city !== 'all') filteredTransfers = filteredTransfers.filter(t => t.City === city);
             if (store !== 'all') filteredTransfers = filteredTransfers.filter(t => t.From_Store === store || t.To_Store === store);
             if (q) {
-                filteredTransfers = filteredTransfers.filter(t => 
-                    t.Product_ID.toLowerCase().includes(q) ||
-                    t.From_Store.toLowerCase().includes(q) ||
-                    t.To_Store.toLowerCase().includes(q) ||
-                    t.City.toLowerCase().includes(q)
-                );
+                filteredTransfers = filteredTransfers.filter(t => t.searchText.includes(q));
             }
             renderTransfersTable(filteredTransfers);
         }
 
-        if (searchInvEl) searchInvEl.addEventListener('input', triggerInventoryAndTransfersFilter);
+        let inventorySearchTimer;
+        if (searchInvEl) {
+            searchInvEl.addEventListener('input', () => {
+                clearTimeout(inventorySearchTimer);
+                inventorySearchTimer = setTimeout(triggerInventoryAndTransfersFilter, 180);
+            });
+        }
         if (invRiskEl) invRiskEl.addEventListener('change', triggerInventoryAndTransfersFilter);
         if (invStoreEl) invStoreEl.addEventListener('change', triggerInventoryAndTransfersFilter);
         if (invCatEl) invCatEl.addEventListener('change', triggerInventoryAndTransfersFilter);
