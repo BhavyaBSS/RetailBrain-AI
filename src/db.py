@@ -240,6 +240,26 @@ def record_stock_transfer_and_update_inventory(entry: Dict[str, Any]) -> None:
             )
 
 
+def update_stock_transfer_eta(transfer_id: str, eta_result: Dict[str, Any], eta_at: Any) -> None:
+    """Replace an initial estimate with the resolved live-traffic route."""
+    with get_conn() as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                UPDATE stock_transfers
+                SET eta_text = %s, distance_km = %s, eta_minutes = %s, eta_at = %s
+                WHERE transfer_id = %s
+                """,
+                (
+                    eta_result["eta_text"],
+                    eta_result["distance_km"],
+                    eta_result["duration_minutes"],
+                    eta_at,
+                    transfer_id,
+                ),
+            )
+
+
 def mark_all_completed() -> None:
     """Mirrors the old mark_history_completed() CSV behavior."""
     with get_conn() as conn:

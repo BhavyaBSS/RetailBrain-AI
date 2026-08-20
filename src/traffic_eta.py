@@ -62,7 +62,7 @@ def _fallback_eta(origin_lat, origin_lon, dest_lat, dest_lon, avg_speed_kmh=DEFA
     return {"distance_km": round(distance_km, 1), "duration_minutes": duration_minutes, "source": "fallback_formula"}
 
 
-def get_transfer_eta(origin_lat, origin_lon, dest_lat, dest_lon):
+def get_transfer_eta(origin_lat, origin_lon, dest_lat, dest_lon, fetch_live_traffic=True):
     """Core routing call: returns {distance_km, duration_minutes, source} between two coordinates."""
     cache_key = (round(origin_lat, 4), round(origin_lon, 4), round(dest_lat, 4), round(dest_lon, 4))
     cached = _route_cache.get(cache_key)
@@ -73,6 +73,9 @@ def get_transfer_eta(origin_lat, origin_lon, dest_lat, dest_lon):
         result = _fallback_eta(origin_lat, origin_lon, dest_lat, dest_lon)
         _route_cache[cache_key] = (time.time(), result)
         return result
+
+    if not fetch_live_traffic:
+        return _fallback_eta(origin_lat, origin_lon, dest_lat, dest_lon)
 
     coords = f"{origin_lat},{origin_lon}:{dest_lat},{dest_lon}"
     url = TOMTOM_ROUTING_URL.format(coords=coords)
@@ -122,7 +125,7 @@ def _load_stores(stores_file):
     return df
 
 
-def get_store_transfer_eta(from_store_id, to_store_id, stores_file):
+def get_store_transfer_eta(from_store_id, to_store_id, stores_file, fetch_live_traffic=True):
     """
     Looks up Latitude/Longitude for both stores from the stores file and
     returns a live-traffic ETA between them. Falls back to the distance
@@ -135,6 +138,7 @@ def get_store_transfer_eta(from_store_id, to_store_id, stores_file):
         return get_transfer_eta(
             from_row["Latitude"], from_row["Longitude"],
             to_row["Latitude"], to_row["Longitude"],
+            fetch_live_traffic=fetch_live_traffic,
         )
     except Exception as e:
         logger.warning(f"Could not compute store-to-store ETA ({from_store_id} -> {to_store_id}): {e}")

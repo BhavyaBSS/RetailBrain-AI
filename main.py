@@ -845,11 +845,12 @@ def approve_purchase_order(
 
 @app.post("/api/action/approve-transfer")
 def approve_stock_transfer(
+    background_tasks: BackgroundTasks,
     from_store: str = Body(..., embed=True),
     to_store: str = Body(..., embed=True),
     product_id: str = Body(..., embed=True),
     transfer_qty: int = Body(..., embed=True),
-    city: str = Body(..., embed=True)
+    city: str = Body(..., embed=True),
 ):
     """
     Approves an inter-store stock transfer and updates database inventory atomically.
@@ -857,9 +858,10 @@ def approve_stock_transfer(
     transfer_id = f"TRK-{city[:3].upper()}-{random.randint(1000, 9999)}"
     transaction_time = datetime.now(IST)
 
-    # Live-traffic ETA based on real store coordinates (Stores_Registry),
-    # instead of a hardcoded 45 minutes.
-    eta_result = traffic_eta.get_store_transfer_eta(from_store, to_store, cfg.STORES_FILE)
+    # Return immediately with a local route estimate; live traffic resolves after dispatch.
+    eta_result = traffic_eta.get_store_transfer_eta(
+        from_store, to_store, cfg.STORES_FILE, fetch_live_traffic=False
+    )
     eta_time = transaction_time + timedelta(minutes=eta_result["duration_minutes"])
 
     transfer_entry = {
@@ -897,6 +899,13 @@ def approve_stock_transfer(
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     invalidate_live_operations_cache()
+    background_tasks.add_task(
+        _resolve_transfer_route,
+        transfer_id,
+        from_store,
+        to_store,
+        transaction_time,
+    )
     
     logger.info(f"CENTRAL ACTION: Stock Transfer {transfer_id} approved from {from_store} -> {to_store}")
     return {
@@ -904,6 +913,25 @@ def approve_stock_transfer(
         "message": f"Stock Transfer Truck {transfer_id} dispatched from {from_store} to {to_store} ({transfer_qty} units).",
         "transfer_details": transfer_entry
     }
+
+
+def _resolve_transfer_route(
+    transfer_id: str,
+    from_store: str,
+    to_store: str,
+    transaction_time: datetime,
+) -> None:
+    """Resolve live traffic after the dispatch response has been sent."""
+    try:
+        eta_result = traffic_eta.get_store_transfer_eta(from_store, to_store, cfg.STORES_FILE)
+        eta_result["eta_text"] = traffic_eta.format_eta_for_log(eta_result)
+        db.update_stock_transfer_eta(
+            transfer_id,
+            eta_result,
+            transaction_time + timedelta(minutes=eta_result["duration_minutes"]),
+        )
+    except Exception as e:
+        logger.warning(f"Could not resolve live route for transfer {transfer_id}: {e}")
 
 
 @app.get("/api/action/dispatch-history")
