@@ -75,19 +75,24 @@
     // Thin atmospheric glow rim (slightly larger sphere, backside, additive)
     const glowGeometry = new THREE.SphereGeometry(1.65, 64, 64);
     const glowMaterial = new THREE.MeshBasicMaterial({
-        color: 0x4facfe,
+        color: 0x38bdf8,
         transparent: true,
-        opacity: 0.18,
+        opacity: 0.28,
         side: THREE.BackSide,
     });
     const glow = new THREE.Mesh(glowGeometry, glowMaterial);
     scene.add(glow);
 
-    // Lighting — a key light plus soft ambient fill so the night side isn't pure black
-    const keyLight = new THREE.DirectionalLight(0xffffff, 1.1);
+    // Lighting — a key light plus a soft sky-blue fill from the opposite
+    // side so the "night" hemisphere reads as a dim blue, not pure black,
+    // which matters now that the globe sits on a light background.
+    const keyLight = new THREE.DirectionalLight(0xffffff, 1.3);
     keyLight.position.set(5, 2, 5);
     scene.add(keyLight);
-    scene.add(new THREE.AmbientLight(0x8899bb, 0.35));
+    const fillLight = new THREE.DirectionalLight(0x8ec9ff, 0.7);
+    fillLight.position.set(-5, -1, -4);
+    scene.add(fillLight);
+    scene.add(new THREE.AmbientLight(0x9fc9ff, 0.55));
 
     function resizeRenderer() {
         const w = panel.clientWidth;
