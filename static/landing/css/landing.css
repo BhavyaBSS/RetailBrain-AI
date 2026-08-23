@@ -4,15 +4,15 @@
    ========================================================================== */
 
 :root {
-    --bg-base: #f4f6fb;
-    --bg-void: #f4f6fb;
-    --text-primary: #0f172a;
-    --text-secondary: #475569;
+    --bg-base: #07090e;
+    --bg-void: #05070d;
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
     --text-muted: #64748b;
 
-    --color-cyan: #0EA5E9;
-    --color-cyan-soft: #7DD3FC;
-    --primary-gradient: linear-gradient(135deg, #38BDF8 0%, #A78BFA 100%);
+    --color-cyan: #5EEAD4;
+    --color-cyan-soft: #93C5FD;
+    --primary-gradient: linear-gradient(135deg, #5EEAD4 0%, #93C5FD 100%);
 
     --font-heading: 'Outfit', sans-serif;
     --font-body: 'Inter', sans-serif;
@@ -41,7 +41,7 @@ html, body {
     position: fixed;
     inset: 0;
     z-index: 0;
-    background: radial-gradient(ellipse at 70% 50%, #e9edf7 0%, var(--bg-void) 70%);
+    background: radial-gradient(ellipse at 70% 50%, #0d1220 0%, var(--bg-void) 70%);
 }
 
 /* ---------- Layout ---------- */
@@ -115,13 +115,13 @@ html, body {
     font-weight: 600;
     letter-spacing: 0.02em;
     cursor: pointer;
-    box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.5);
+    box-shadow: 0 0 0 0 rgba(79, 172, 254, 0.5);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .start-button:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(56, 189, 248, 0.4);
+    box-shadow: 0 8px 24px rgba(79, 172, 254, 0.35);
 }
 
 .start-button:active {
