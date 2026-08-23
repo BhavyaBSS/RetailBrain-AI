@@ -24,11 +24,11 @@
     --text-muted: #64748b;
     
     /* Functional Colors */
-    --color-cyan: #00f2fe;
-    --color-emerald: #10b981;
-    --color-amber: #f59e0b;
-    --color-rose: #f43f5e;
-    --color-purple: #a855f7;
+    --color-cyan: #5EEAD4;
+    --color-emerald: #6BCB77;
+    --color-amber: #FFD93D;
+    --color-rose: #FF6B6B;
+    --color-purple: #A78BFA;
     
     /* Spacing & Radii */
     --radius-sm: 8px;
