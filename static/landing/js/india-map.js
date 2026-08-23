@@ -92,52 +92,52 @@
             const isRoad = /road|street|highway|motorway|trunk|primary|secondary|tertiary|transport/.test(layerName);
 
             if (layer.type === "background") {
-                setPaint(layer.id, "background-color", "#05070d");
+                setPaint(layer.id, "background-color", "#eef2f9");
             } else if (layer.type === "fill") {
                 if (isWater) {
-                    setPaint(layer.id, "fill-color", "#08283a");
+                    setPaint(layer.id, "fill-color", "#bfe3f0");
                     setPaint(layer.id, "fill-opacity", 0.95);
                 } else if (isGreen) {
-                    setPaint(layer.id, "fill-color", "#102b28");
-                    setPaint(layer.id, "fill-opacity", 0.72);
+                    setPaint(layer.id, "fill-color", "#cdebd4");
+                    setPaint(layer.id, "fill-opacity", 0.75);
                 } else if (isBuilding) {
-                    setPaint(layer.id, "fill-color", "#253246");
-                    setPaint(layer.id, "fill-opacity", 0.78);
+                    setPaint(layer.id, "fill-color", "#e2e8f0");
+                    setPaint(layer.id, "fill-opacity", 0.8);
                 } else {
-                    setPaint(layer.id, "fill-color", "#0c1421");
+                    setPaint(layer.id, "fill-color", "#f8fafc");
                     setPaint(layer.id, "fill-opacity", 0.9);
                 }
             } else if (layer.type === "line") {
                 if (isBoundary) {
-                    setPaint(layer.id, "line-color", "#4d8aa8");
-                    setPaint(layer.id, "line-opacity", 0.9);
+                    setPaint(layer.id, "line-color", "#7c3aed");
+                    setPaint(layer.id, "line-opacity", 0.55);
                 } else if (isWater) {
-                    setPaint(layer.id, "line-color", "#25769a");
-                    setPaint(layer.id, "line-opacity", 0.88);
+                    setPaint(layer.id, "line-color", "#38bdf8");
+                    setPaint(layer.id, "line-opacity", 0.7);
                 } else if (isRoad) {
-                    setPaint(layer.id, "line-color", "#52627a");
-                    setPaint(layer.id, "line-opacity", 0.82);
+                    setPaint(layer.id, "line-color", "#94a3b8");
+                    setPaint(layer.id, "line-opacity", 0.75);
                 } else {
-                    setPaint(layer.id, "line-color", "#34465d");
-                    setPaint(layer.id, "line-opacity", 0.72);
+                    setPaint(layer.id, "line-color", "#cbd5e1");
+                    setPaint(layer.id, "line-opacity", 0.65);
                 }
             } else if (layer.type === "symbol") {
-                setPaint(layer.id, "text-color", "#b8c6d9");
-                setPaint(layer.id, "text-halo-color", "#05070d");
+                setPaint(layer.id, "text-color", "#334155");
+                setPaint(layer.id, "text-halo-color", "#f8fafc");
                 setPaint(layer.id, "text-halo-width", 1.4);
-                setPaint(layer.id, "text-opacity", 0.82);
-                setPaint(layer.id, "icon-opacity", 0.7);
+                setPaint(layer.id, "text-opacity", 0.9);
+                setPaint(layer.id, "icon-opacity", 0.8);
             } else if (layer.type === "circle") {
-                setPaint(layer.id, "circle-color", "#4d8aa8");
-                setPaint(layer.id, "circle-stroke-color", "#07111d");
+                setPaint(layer.id, "circle-color", "#0284c7");
+                setPaint(layer.id, "circle-stroke-color", "#ffffff");
             } else if (layer.type === "fill-extrusion") {
-                setPaint(layer.id, "fill-extrusion-color", "#253246");
-                setPaint(layer.id, "fill-extrusion-opacity", 0.72);
+                setPaint(layer.id, "fill-extrusion-color", "#e2e8f0");
+                setPaint(layer.id, "fill-extrusion-opacity", 0.78);
             } else if (layer.type === "raster") {
-                setPaint(layer.id, "raster-brightness-min", 0.05);
-                setPaint(layer.id, "raster-brightness-max", 0.42);
-                setPaint(layer.id, "raster-saturation", -0.45);
-                setPaint(layer.id, "raster-contrast", 0.25);
+                setPaint(layer.id, "raster-brightness-min", 0.35);
+                setPaint(layer.id, "raster-brightness-max", 1);
+                setPaint(layer.id, "raster-saturation", 0.1);
+                setPaint(layer.id, "raster-contrast", 0.1);
             }
         });
     }
@@ -227,15 +227,15 @@
             id: fillId,
             type: "fill",
             source: sourceId,
-            paint: { "fill-color": "#5ee7ff", "fill-opacity": 0.12 },
+            paint: { "fill-color": "#0891b2", "fill-opacity": 0.1 },
         }, beforeId);
         map.addLayer({
             id: outlineId,
             type: "line",
             source: sourceId,
             paint: {
-                "line-color": "#5ee7ff",
-                "line-opacity": 0.78,
+                "line-color": "#0891b2",
+                "line-opacity": 0.75,
                 "line-width": 2.4,
                 "line-dasharray": [1.5, 1.5],
             },
@@ -302,17 +302,17 @@
         map.addSource(maskSourceId, { type: "geojson", data: outsideMask(immediateShape) });
         map.addLayer({
             id: `${sourceId}-mask`, type: "fill", source: maskSourceId,
-            paint: { "fill-color": "#03060d", "fill-opacity": 0.9 },
+            paint: { "fill-color": "#e2e8f0", "fill-opacity": 0.55 },
         }, beforeId);
         map.addLayer({
             id: `${sourceId}-fill`, type: "fill", source: sourceId,
-            paint: { "fill-color": "#5ee7ff", "fill-opacity": 0.3 },
+            paint: { "fill-color": "#A78BFA", "fill-opacity": 0.22 },
         }, beforeId);
         map.addLayer({
             id: `${sourceId}-glow`, type: "line", source: sourceId,
             paint: {
-                "line-color": "#00dcff",
-                "line-opacity": 0.24,
+                "line-color": "#8b5cf6",
+                "line-opacity": 0.3,
                 "line-width": 12,
                 "line-blur": 8,
             },
@@ -320,8 +320,8 @@
         map.addLayer({
             id: `${sourceId}-outline`, type: "line", source: sourceId,
             paint: {
-                "line-color": "#69eaff",
-                "line-opacity": 0.95,
+                "line-color": "#7c3aed",
+                "line-opacity": 0.9,
                 "line-width": 4,
                 "line-dasharray": [1.2, 1.2],
             },
