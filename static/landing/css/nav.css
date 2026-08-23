@@ -6,7 +6,7 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    background: rgba(11, 15, 26, 0.85);
+    background: rgba(255, 255, 255, 0.85);
     border: 1px solid rgba(0, 242, 254, 0.2);
     border-radius: 30px;
     padding: 4px 8px;
@@ -18,7 +18,7 @@
 .nav-link-btn {
     background: transparent;
     border: none;
-    color: var(--text-secondary, #94a3b8);
+    color: var(--text-secondary, #475569);
     font-family: var(--font-body, 'Inter', sans-serif);
     font-size: 0.82rem;
     font-weight: 600;
@@ -40,13 +40,13 @@
 
 .nav-link-btn.btn-dashboard-link {
     background: rgba(255, 255, 255, 0.06);
-    color: #e2e8f0;
+    color: #1e293b;
     border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .nav-link-btn.btn-dashboard-link:hover {
     background: rgba(255, 255, 255, 0.15);
-    color: #ffffff;
+    color: #0f172a;
 }
 
 /* Modal overlays for Executive KPIs & Dispatch History */
@@ -75,7 +75,7 @@
 .nav-modal-content {
     width: clamp(380px, 85vw, 800px);
     max-height: 85vh;
-    background: rgba(11, 15, 26, 0.98);
+    background: rgba(255, 255, 255, 0.98);
     border: 1px solid rgba(0, 242, 254, 0.3);
     border-radius: 18px;
     padding: 24px 28px;
@@ -112,7 +112,7 @@
 }
 
 .kpi-card-box {
-    background: rgba(15, 23, 42, 0.6);
+    background: rgba(255, 255, 255, 0.85);
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 12px;
     padding: 16px;
@@ -120,7 +120,7 @@
 
 .kpi-card-title {
     font-size: 0.78rem;
-    color: #94a3b8;
+    color: #475569;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     margin-bottom: 6px;
@@ -130,16 +130,16 @@
     font-family: 'JetBrains Mono', monospace;
     font-size: 1.3rem;
     font-weight: 700;
-    color: #ffffff;
+    color: #0f172a;
 }
 
 .kpi-card-number.cyan { color: var(--color-cyan, #00f2fe); }
-.kpi-card-number.emerald { color: #34d399; }
-.kpi-card-number.rose { color: #f87171; }
+.kpi-card-number.emerald { color: #059669; }
+.kpi-card-number.rose { color: #dc2626; }
 
 .kpi-card-detail {
     margin-top: 4px;
-    color: #94a3b8;
+    color: #475569;
     font-size: 0.74rem;
 }
 
@@ -153,7 +153,7 @@
 .forecast-visual-panel {
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 14px;
-    background: rgba(7, 9, 14, 0.58);
+    background: rgba(255, 255, 255, 0.7);
     padding: 18px;
 }
 
@@ -165,7 +165,7 @@
 
 .forecast-field-label {
     margin-top: 5px;
-    color: #94a3b8;
+    color: #475569;
     font-size: 0.78rem;
     font-weight: 700;
 }
@@ -183,7 +183,7 @@
 }
 
 .forecast-chart-title {
-    color: #e2e8f0;
+    color: #1e293b;
     font-family: var(--font-heading, 'Outfit', sans-serif);
     font-weight: 700;
     font-size: 0.9rem;
@@ -204,7 +204,7 @@
 .forecast-stats-row > div {
     padding: 9px 12px;
     border-radius: 9px;
-    background: rgba(15, 23, 42, 0.75);
+    background: rgba(241, 245, 249, 0.92);
 }
 
 .forecast-stats-row span,
@@ -213,14 +213,14 @@
 }
 
 .forecast-stats-row span {
-    color: #94a3b8;
+    color: #475569;
     font-size: 0.68rem;
     text-transform: uppercase;
 }
 
 .forecast-stats-row b {
     margin-top: 2px;
-    color: #67e8f9;
+    color: #0e7490;
     font: 700 0.86rem 'JetBrains Mono', monospace;
 }
 
@@ -251,8 +251,8 @@
 }
 
 .forecast-point {
-    fill: #07111d;
-    stroke: #67e8f9;
+    fill: #ffffff;
+    stroke: #0e7490;
     stroke-width: 2;
 }
 
@@ -260,11 +260,11 @@
 .nav-error-state {
     padding: 42px 20px;
     text-align: center;
-    color: #94a3b8;
+    color: #475569;
 }
 
 .nav-error-state {
-    color: #fb7185;
+    color: #e11d48;
 }
 
 .audit-toolbar {
@@ -273,7 +273,7 @@
     justify-content: space-between;
     gap: 12px;
     margin-bottom: 10px;
-    color: #94a3b8;
+    color: #475569;
     font-size: 0.76rem;
     flex-shrink: 0;
 }
@@ -289,8 +289,8 @@
 .audit-remove-btn {
     border: 1px solid rgba(148, 163, 184, 0.28);
     border-radius: 8px;
-    background: rgba(15, 23, 42, 0.75);
-    color: #cbd5e1;
+    background: rgba(241, 245, 249, 0.92);
+    color: #334155;
     padding: 7px 10px;
     font: 700 0.7rem var(--font-body, 'Inter', sans-serif);
     cursor: pointer;
@@ -300,13 +300,13 @@
 .audit-toolbar-btn:hover,
 .audit-remove-btn:hover {
     border-color: rgba(0, 242, 254, 0.55);
-    color: #67e8f9;
+    color: #0e7490;
 }
 
 .audit-download-btn {
     border-color: rgba(0, 242, 254, 0.42);
     background: rgba(0, 242, 254, 0.1);
-    color: #67e8f9;
+    color: #0e7490;
 }
 
 .audit-table-wrap {
@@ -329,7 +329,7 @@
 .audit-card {
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 12px;
-    background: rgba(15, 23, 42, 0.55);
+    background: rgba(255, 255, 255, 0.85);
     padding: 12px 14px;
 }
 
@@ -369,23 +369,23 @@
 
 .audit-type-po {
     background: rgba(167, 139, 250, 0.16);
-    color: #c4b5fd;
+    color: #7c3aed;
 }
 
 .audit-type-transfer {
     background: rgba(0, 242, 254, 0.14);
-    color: #67e8f9;
+    color: #0e7490;
 }
 
 .audit-card-ref {
-    color: #cbd5e1;
+    color: #334155;
     font: 700 0.78rem 'JetBrains Mono', monospace;
     word-break: break-word;
 }
 
 .audit-card-title {
     margin-top: 8px;
-    color: #e2e8f0;
+    color: #1e293b;
     font-size: 0.82rem;
     font-weight: 600;
     line-height: 1.4;
@@ -414,27 +414,27 @@
 }
 
 .audit-field-value {
-    color: #e2e8f0;
+    color: #1e293b;
     font-size: 0.78rem;
     word-break: break-word;
 }
 
 .audit-eta-value {
-    color: #94a3b8;
+    color: #475569;
 }
 
 .audit-countdown {
-    color: #67e8f9;
+    color: #0e7490;
     font: 800 0.8rem 'JetBrains Mono', monospace;
 }
 
 .audit-countdown.is-complete {
-    color: #34d399;
+    color: #059669;
 }
 
 .audit-completed-at {
     margin-top: 8px;
-    color: #6ee7b7;
+    color: #059669;
     font-size: 0.68rem;
 }
 
@@ -446,9 +446,9 @@
 
 .audit-remove-btn {
     border: 1px solid rgba(248, 113, 113, 0.28);
-    color: #fca5a5;
+    color: #dc2626;
     border-radius: 8px;
-    background: rgba(15, 23, 42, 0.75);
+    background: rgba(241, 245, 249, 0.92);
     padding: 7px 10px;
     font: 700 0.7rem var(--font-body, 'Inter', sans-serif);
     cursor: pointer;
@@ -456,12 +456,12 @@
 
 .audit-remove-btn:hover {
     border-color: rgba(248, 113, 113, 0.55);
-    color: #fecaca;
+    color: #b91c1c;
 }
 
 .audit-empty-state {
     padding: 30px !important;
-    color: #94a3b8;
+    color: #475569;
     text-align: center;
 }
 

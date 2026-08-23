@@ -71,7 +71,7 @@ html, body {
     position: absolute;
     inset: 0;
     z-index: 1;
-    background: #05070d;
+    background: #eef2f9;
 }
 
 /* ---------- Custom city marker ---------- */
@@ -125,8 +125,8 @@ html, body {
     left: 50%;
     transform: translateX(-50%) translateY(6px);
     min-width: 200px;
-    background: var(--deep-space, #0b0f1a);
-    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: var(--deep-space, #ffffff);
+    border: 1px solid rgba(15, 23, 42, 0.12);
     border-radius: 12px;
     padding: 14px 16px;
     opacity: 0;
@@ -148,7 +148,7 @@ html, body {
     left: 50%;
     transform: translateX(-50%);
     border: 7px solid transparent;
-    border-top-color: var(--deep-space, #0b0f1a);
+    border-top-color: var(--deep-space, #ffffff);
 }
 
 .city-info-name {
@@ -185,7 +185,7 @@ html, body {
 
 /* ---------- MapLibre default control tweaks ---------- */
 .maplibregl-ctrl-attrib {
-    background: rgba(5, 7, 13, 0.6) !important;
+    background: rgba(255, 255, 255, 0.85) !important;
 }
 .maplibregl-ctrl-attrib a {
     color: var(--text-secondary) !important;
@@ -211,7 +211,7 @@ html, body {
     box-sizing: border-box;
     border-radius: 50%;
     background: var(--color-cyan, #00f2fe);
-    border: 2px solid #ffffff;
+    border: 2px solid #0f172a;
     box-shadow: 0 0 10px rgba(0, 242, 254, 0.7);
     transition: transform 0.2s ease, background-color 0.2s ease;
 }
@@ -233,14 +233,14 @@ html, body {
     font-family: var(--font-body);
     font-size: 0.75rem;
     font-weight: 600;
-    color: #e2e8f0;
+    color: #1e293b;
     white-space: nowrap;
     text-shadow: 0 1px 6px rgba(0, 0, 0, 0.9);
     pointer-events: none;
-    background: rgba(7, 9, 14, 0.75);
+    background: rgba(255, 255, 255, 0.9);
     padding: 2px 6px;
     border-radius: 4px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(15, 23, 42, 0.1);
 }
 
 .store-info {
@@ -249,7 +249,7 @@ html, body {
     left: 50%;
     transform: translateX(-50%) translateY(6px);
     min-width: 220px;
-    background: var(--deep-space, #0b0f1a);
+    background: var(--deep-space, #ffffff);
     border: 1px solid rgba(0, 242, 254, 0.3);
     border-radius: 12px;
     padding: 12px 14px;
@@ -270,7 +270,7 @@ html, body {
     font-family: var(--font-heading);
     font-size: 0.95rem;
     font-weight: 700;
-    color: var(--text-primary, #ffffff);
+    color: var(--text-primary, #0f172a);
     margin-bottom: 2px;
 }
 
@@ -284,14 +284,14 @@ html, body {
     display: flex;
     justify-content: space-between;
     font-size: 0.8rem;
-    color: var(--text-secondary, #94a3b8);
+    color: var(--text-secondary, #475569);
     padding: 2px 0;
 }
 
 .store-info-row .value {
     font-family: 'JetBrains Mono', monospace;
     font-weight: 600;
-    color: #ffffff;
+    color: #0f172a;
 }
 
 .store-info-row .value.alert {
@@ -301,7 +301,7 @@ html, body {
 .store-click-hint {
     margin-top: 8px;
     padding-top: 6px;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-top: 1px solid rgba(15, 23, 42, 0.1);
     font-size: 0.75rem;
     color: var(--color-cyan, #00f2fe);
     text-align: center;

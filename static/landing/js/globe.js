@@ -35,7 +35,7 @@
             for (const s of stars) {
                 const alpha = 0.35 + 0.65 * Math.abs(Math.sin(s.phase + t * s.twinkleSpeed));
                 ctx.beginPath();
-                ctx.fillStyle = `rgba(230, 238, 248, ${alpha.toFixed(2)})`;
+                ctx.fillStyle = `rgba(100, 116, 139, ${alpha.toFixed(2)})`;
                 ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
                 ctx.fill();
             }

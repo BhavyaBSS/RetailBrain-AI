@@ -27,7 +27,7 @@
 .flow-modal {
     width: clamp(380px, 92vw, 920px);
     max-height: 90vh;
-    background: rgba(11, 15, 26, 0.98);
+    background: rgba(255, 255, 255, 0.98);
     border: 1px solid rgba(0, 242, 254, 0.35);
     border-radius: 20px;
     box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9);
@@ -50,8 +50,8 @@
 /* Modal Header */
 .flow-modal-header {
     padding: 20px 28px;
-    background: rgba(7, 9, 14, 0.8);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.9);
+    border-bottom: 1px solid rgba(15, 23, 42, 0.08);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -61,7 +61,7 @@
     font-family: var(--font-heading, 'Outfit', sans-serif);
     font-size: 1.35rem;
     font-weight: 700;
-    color: #ffffff;
+    color: #0f172a;
     margin: 0;
 }
 
@@ -97,8 +97,8 @@
     width: 100%;
     min-width: 0;
     height: 430px;
-    background: rgba(7, 9, 14, 0.6);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.85);
+    border: 1px solid rgba(15, 23, 42, 0.08);
     border-radius: 16px;
     display: flex;
     align-items: center;
@@ -111,7 +111,7 @@
     top: 18px;
     left: 20px;
     z-index: 8;
-    color: #f8fafc;
+    color: #0f172a;
     font-family: var(--font-heading, 'Outfit', sans-serif);
     font-size: 0.9rem;
     font-weight: 700;
@@ -122,7 +122,7 @@
     top: 40px;
     left: 20px;
     z-index: 8;
-    color: #7890a9;
+    color: #64748b;
     font-size: 0.68rem;
 }
 
@@ -159,9 +159,9 @@
     width: 42px;
     height: 42px;
     border-radius: 50%;
-    background: rgba(15, 23, 42, 0.9);
-    border: 2px solid rgba(255, 255, 255, 0.2);
-    color: #ffffff;
+    background: rgba(255, 255, 255, 0.95);
+    border: 2px solid rgba(15, 23, 42, 0.2);
+    color: #0f172a;
     font-size: 0.72rem;
     font-weight: 700;
     display: flex;
@@ -176,7 +176,7 @@
 .radar-node small {
     display: block;
     margin-top: -2px;
-    color: #94a3b8;
+    color: #475569;
     font-size: 0.5rem;
     line-height: 1;
 }
@@ -198,7 +198,7 @@
     position: absolute;
     top: calc(100% + 4px);
     font-size: 0.7rem;
-    color: #cbd5e1;
+    color: #334155;
     display: none;
     width: 128px;
     white-space: normal;
@@ -232,7 +232,7 @@
 .rec-title {
     font-size: 0.82rem;
     font-weight: 700;
-    color: #34d399;
+    color: #059669;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     margin-bottom: 2px;
@@ -240,7 +240,7 @@
 
 .rec-desc {
     font-size: 0.85rem;
-    color: #e2e8f0;
+    color: #1e293b;
 }
 
 .form-group {
@@ -252,15 +252,15 @@
 .form-label {
     font-size: 0.82rem;
     font-weight: 600;
-    color: #94a3b8;
+    color: #475569;
 }
 
 .form-select, .form-input {
-    background: rgba(7, 9, 14, 0.8);
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(15, 23, 42, 0.15);
     border-radius: 8px;
     padding: 10px 14px;
-    color: #ffffff;
+    color: #0f172a;
     font-size: 0.9rem;
     outline: none;
 }
@@ -303,8 +303,8 @@
 /* Modal Footer Action */
 .flow-modal-footer {
     padding: 16px 28px;
-    background: rgba(7, 9, 14, 0.8);
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.9);
+    border-top: 1px solid rgba(15, 23, 42, 0.08);
     display: flex;
     justify-content: flex-end;
     gap: 12px;
@@ -342,8 +342,8 @@
     padding: 9px 11px;
     border: 1px solid rgba(148, 163, 184, 0.22);
     border-radius: 8px;
-    background: rgba(15, 23, 42, 0.55);
-    color: #a8b4c8;
+    background: rgba(255, 255, 255, 0.85);
+    color: #64748b;
     font-size: 0.76rem;
     font-weight: 600;
     line-height: 1.4;
@@ -352,19 +352,19 @@
 .transfer-qty-warning.is-safe {
     border-color: rgba(52, 211, 153, 0.42);
     background: rgba(16, 185, 129, 0.1);
-    color: #6ee7b7;
+    color: #059669;
 }
 
 .transfer-qty-warning.is-warning {
     border-color: rgba(251, 191, 36, 0.55);
     background: rgba(245, 158, 11, 0.12);
-    color: #fcd34d;
+    color: #ca8a04;
 }
 
 .transfer-qty-warning.is-error {
     border-color: rgba(248, 113, 113, 0.55);
     background: rgba(239, 68, 68, 0.12);
-    color: #fca5a5;
+    color: #dc2626;
 }
 
 /* Toast Success Notification (4-5s popup) */
@@ -380,7 +380,7 @@
 }
 
 .cinematic-toast {
-    background: rgba(11, 15, 26, 0.96);
+    background: rgba(255, 255, 255, 0.97);
     border: 1px solid rgba(0, 242, 254, 0.5);
     border-radius: 14px;
     padding: 16px 20px;
@@ -399,7 +399,7 @@
     border-radius: 50%;
     background: rgba(16, 185, 129, 0.2);
     border: 1px solid #10b981;
-    color: #34d399;
+    color: #059669;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -415,12 +415,12 @@
     font-family: var(--font-heading, 'Outfit', sans-serif);
     font-size: 0.95rem;
     font-weight: 700;
-    color: #ffffff;
+    color: #0f172a;
 }
 
 .toast-message {
     font-size: 0.8rem;
-    color: #94a3b8;
+    color: #475569;
     margin-top: 2px;
 }
 
