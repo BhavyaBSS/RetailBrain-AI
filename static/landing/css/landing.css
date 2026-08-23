@@ -10,9 +10,9 @@
     --text-secondary: #94a3b8;
     --text-muted: #64748b;
 
-    --color-cyan: #5EEAD4;
-    --color-cyan-soft: #93C5FD;
-    --primary-gradient: linear-gradient(135deg, #5EEAD4 0%, #93C5FD 100%);
+    --color-cyan: #C4B5FD;
+    --color-cyan-soft: #DDD6FE;
+    --primary-gradient: linear-gradient(135deg, #C4B5FD 0%, #A5B4FC 100%);
 
     --font-heading: 'Outfit', sans-serif;
     --font-body: 'Inter', sans-serif;
