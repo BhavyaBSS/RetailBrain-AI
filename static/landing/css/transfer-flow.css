@@ -6,7 +6,7 @@
 .transfer-modal-backdrop, .purchase-modal-backdrop {
     position: fixed;
     inset: 0;
-    z-index: 300;
+    z-index: 10020;
     background: rgba(5, 7, 13, 0.85);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);

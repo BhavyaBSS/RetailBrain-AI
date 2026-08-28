@@ -198,11 +198,11 @@ html, body {
     height: 16px;
     box-sizing: border-box;
     cursor: pointer;
-    z-index: 1;
+    z-index: 5;
 }
 
 .store-marker:hover {
-    z-index: 100;
+    z-index: 1000;
 }
 
 .store-dot {
@@ -213,57 +213,223 @@ html, body {
     background: var(--color-cyan, #00f2fe);
     border: 2px solid #ffffff;
     box-shadow: 0 0 10px rgba(0, 242, 254, 0.7);
-    transition: transform 0.2s ease, background-color 0.2s ease;
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .store-dot.has-alert {
     background: #ff4757;
-    box-shadow: 0 0 12px rgba(255, 71, 87, 0.8);
+    box-shadow: 0 0 14px rgba(255, 71, 87, 0.85);
 }
 
 .store-marker:hover .store-dot {
-    transform: scale(1.35);
+    transform: scale(1.4);
 }
 
+/* De-cluttered, non-overlapping store labels visible for ALL stores */
 .store-label {
     position: absolute;
-    top: calc(100% + 6px);
-    left: 50%;
-    transform: translateX(-50%);
     font-family: var(--font-body);
-    font-size: 0.75rem;
+    font-size: 0.68rem;
     font-weight: 600;
     color: #e2e8f0;
     white-space: nowrap;
-    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.9);
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95);
     pointer-events: none;
-    background: rgba(7, 9, 14, 0.75);
+    background: rgba(5, 10, 22, 0.9);
+    backdrop-filter: blur(6px);
     padding: 2px 6px;
     border-radius: 4px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(0, 242, 254, 0.35);
+    opacity: 0.92;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.65);
+    z-index: 10;
 }
 
-.store-info {
-    position: absolute;
-    bottom: calc(100% + 12px);
+.store-label.label-pos-bottom {
+    top: calc(100% + 5px);
     left: 50%;
-    transform: translateX(-50%) translateY(6px);
-    min-width: 220px;
+    transform: translateX(-50%);
+}
+
+.store-label.label-pos-top {
+    bottom: calc(100% + 5px);
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.store-label.label-pos-right {
+    left: calc(100% + 6px);
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.store-label.label-pos-left {
+    right: calc(100% + 6px);
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.store-marker:hover .store-label {
+    opacity: 0; /* Hide small label when detailed hover info card appears */
+}
+
+/* ---------- Hover info card with smart screen boundary containment ---------- */
+.city-info, .store-info {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%) translateY(4px);
+    min-width: 250px;
+    max-width: min(300px, 85vw);
+    max-height: min(440px, calc(100vh - 100px));
+    overflow-y: auto;
     background: var(--deep-space, #0b0f1a);
-    border: 1px solid rgba(0, 242, 254, 0.3);
-    border-radius: 12px;
+    border: 1px solid rgba(0, 242, 254, 0.45);
+    border-radius: 14px;
     padding: 12px 14px;
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.2s ease, transform 0.2s ease;
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.8);
-    z-index: 25;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.9), 0 0 15px rgba(0, 242, 254, 0.15);
+    z-index: 1001;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 242, 254, 0.3) transparent;
 }
 
-.store-marker:hover .store-info {
+.city-info::-webkit-scrollbar, .store-info::-webkit-scrollbar {
+    width: 4px;
+}
+.city-info::-webkit-scrollbar-thumb, .store-info::-webkit-scrollbar-thumb {
+    background: rgba(0, 242, 254, 0.3);
+    border-radius: 4px;
+}
+
+.city-marker:hover .city-info,
+.store-marker:hover .store-info,
+.city-marker.is-active .city-info,
+.store-marker.is-active .store-info {
     opacity: 1;
     pointer-events: auto;
     transform: translateX(-50%) translateY(0);
+}
+
+/* Invisible hover bridge connecting dot and card so mouse never loses hover */
+.city-info::before, .store-info::before {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: -20px;
+    right: -20px;
+    height: 18px;
+    background: transparent;
+    pointer-events: auto;
+}
+
+/* Default arrow pointing DOWN (for tooltip positioned ABOVE marker) */
+.city-info::after, .store-info::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 7px solid transparent;
+    border-top-color: var(--deep-space, #0b0f1a);
+    pointer-events: none;
+}
+
+/* Smart Flip: Position BELOW marker when near top edge of screen */
+.city-info.flip-bottom, .store-info.flip-bottom {
+    bottom: auto;
+    top: calc(100% + 8px);
+    transform: translateX(-50%) translateY(-4px);
+}
+.city-marker:hover .city-info.flip-bottom,
+.store-marker:hover .store-info.flip-bottom,
+.city-marker.is-active .city-info.flip-bottom,
+.store-marker.is-active .store-info.flip-bottom {
+    transform: translateX(-50%) translateY(0);
+}
+.city-info.flip-bottom::before, .store-info.flip-bottom::before {
+    top: -18px;
+    bottom: auto;
+}
+.city-info.flip-bottom::after, .store-info.flip-bottom::after {
+    top: auto;
+    bottom: 100%;
+    border-top-color: transparent;
+    border-bottom-color: var(--deep-space, #0b0f1a);
+}
+
+/* Smart Align: Shift toward right when marker is near left edge */
+.city-info.align-left, .store-info.align-left {
+    left: -12px;
+    transform: translateY(4px);
+}
+.city-info.align-left.flip-bottom, .store-info.align-left.flip-bottom {
+    transform: translateY(-4px);
+}
+.city-marker:hover .city-info.align-left,
+.store-marker:hover .store-info.align-left,
+.city-marker.is-active .city-info.align-left,
+.store-marker.is-active .store-info.align-left {
+    transform: translateY(0);
+}
+.city-info.align-left::after, .store-info.align-left::after {
+    left: 20px;
+    transform: none;
+}
+
+/* Smart Align: Shift toward left when marker is near right edge */
+.city-info.align-right, .store-info.align-right {
+    left: auto;
+    right: -12px;
+    transform: translateY(4px);
+}
+.city-info.align-right.flip-bottom, .store-info.align-right.flip-bottom {
+    transform: translateY(-4px);
+}
+.city-marker:hover .city-info.align-right,
+.store-marker:hover .store-info.align-right,
+.city-marker.is-active .city-info.align-right,
+.store-marker.is-active .store-info.align-right {
+    transform: translateY(0);
+}
+.city-info.align-right::after, .store-info.align-right::after {
+    left: auto;
+    right: 20px;
+    transform: none;
+}
+
+.store-info-photo-wrap {
+    position: relative;
+    width: calc(100% + 28px);
+    margin: -12px -14px 10px -14px;
+    height: 110px;
+    overflow: hidden;
+    background: #000;
+    border-top-left-radius: 13px;
+    border-top-right-radius: 13px;
+}
+
+.store-info-photo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.store-photo-badge {
+    position: absolute;
+    bottom: 6px;
+    left: 8px;
+    background: rgba(245, 197, 24, 0.95);
+    color: #080d1a;
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.5);
 }
 
 .store-info-title {
@@ -285,7 +451,7 @@ html, body {
     justify-content: space-between;
     font-size: 0.8rem;
     color: var(--text-secondary, #94a3b8);
-    padding: 2px 0;
+    padding: 3px 0;
 }
 
 .store-info-row .value {
@@ -296,6 +462,42 @@ html, body {
 
 .store-info-row .value.alert {
     color: #ff6b6b;
+}
+
+.store-info-actions {
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.store-quick-inspect-btn {
+    width: 100%;
+    padding: 8px 12px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #f5c518;
+    background: rgba(245, 197, 24, 0.1);
+    border: 1px solid rgba(245, 197, 24, 0.5);
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+}
+
+.store-quick-inspect-btn:hover {
+    background: rgba(245, 197, 24, 0.22);
+    border-color: #f5c518;
+    color: #ffffff;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(245, 197, 24, 0.35);
 }
 
 .store-click-hint {
@@ -324,5 +526,6 @@ html, body {
     .map-header { padding: 12px 12px 0; }
     .map-title { font-size: 1.3rem; }
     .map-subtitle { font-size: 0.82rem; }
-    .city-info, .store-info { min-width: 170px; max-width: 78vw; padding: 10px 12px; }
+    .city-info, .store-info { min-width: 170px; max-width: 82vw; padding: 10px 12px; }
 }
+

@@ -96,6 +96,36 @@
         OVERSTOCKED: 0,
     };
 
+    function buildInventoryCandidate(store, sku) {
+        if (!sku) return null;
+        const stock = Number(sku.Current_Stock) || 0;
+        const reservedStock = Number(sku.Reserved_Stock) || 0;
+        const availableStock = Number.isFinite(Number(sku.Available_Stock))
+            ? Number(sku.Available_Stock)
+            : Math.max(stock - reservedStock, 0);
+        const safetyStock = Number(sku.Safety_Stock) || 0;
+        const reorderPoint = Number(sku.Reorder_Point ?? sku.Safety_Stock) || 0;
+        const maximumCapacity = Number(sku.Maximum_Capacity) || Number.MAX_SAFE_INTEGER;
+        const riskState = sku.Risk_State || "OPTIMAL";
+        const optimalEntryTarget = Math.floor(safetyStock) + 1;
+        return {
+            ...store,
+            sku,
+            stock,
+            availableStock,
+            safetyStock,
+            reorderPoint,
+            maximumCapacity,
+            riskState,
+            needPriority: NEED_PRIORITY[riskState] ?? 0,
+            needUnits: riskState === "CRITICAL_STOCKOUT" || riskState === "REORDER_NEEDED"
+                ? Math.max(optimalEntryTarget - stock, 0)
+                : 0,
+            stockCoverage: safetyStock > 0 ? Math.round((availableStock / safetyStock) * 10) / 10 : null,
+            availableUnits: Math.max(availableStock - safetyStock, 0),
+        };
+    }
+
     function getInventoryForProduct(store, productId) {
         return fetch(`/api/inventory/live?store_id=${encodeURIComponent(store.Store_ID)}`)
             .then((res) => {
@@ -104,34 +134,7 @@
             })
             .then((inventory) => {
                 const sku = inventory.find((item) => item.Product_ID === productId);
-                if (!sku) return null;
-
-                const stock = Number(sku.Current_Stock) || 0;
-                const reservedStock = Number(sku.Reserved_Stock) || 0;
-                const availableStock = Number.isFinite(Number(sku.Available_Stock))
-                    ? Number(sku.Available_Stock)
-                    : Math.max(stock - reservedStock, 0);
-                const safetyStock = Number(sku.Safety_Stock) || 0;
-                const reorderPoint = Number(sku.Reorder_Point ?? sku.Safety_Stock) || 0;
-                const maximumCapacity = Number(sku.Maximum_Capacity) || Number.MAX_SAFE_INTEGER;
-                const riskState = sku.Risk_State || "OPTIMAL";
-                const optimalEntryTarget = Math.floor(safetyStock) + 1;
-                return {
-                    ...store,
-                    sku,
-                    stock,
-                    availableStock,
-                    safetyStock,
-                    reorderPoint,
-                    maximumCapacity,
-                    riskState,
-                    needPriority: NEED_PRIORITY[riskState] ?? 0,
-                    needUnits: riskState === "CRITICAL_STOCKOUT" || riskState === "REORDER_NEEDED"
-                        ? Math.max(optimalEntryTarget - stock, 0)
-                        : 0,
-                    stockCoverage: safetyStock > 0 ? Math.round((availableStock / safetyStock) * 10) / 10 : null,
-                    availableUnits: Math.max(availableStock - safetyStock, 0),
-                };
+                return buildInventoryCandidate(store, sku);
             })
             .catch((error) => {
                 console.warn(`Could not load ${productId} stock for ${store.Store_ID}:`, error);
@@ -160,18 +163,20 @@
         const backdrop = document.getElementById("transfer-modal-backdrop");
         backdrop.classList.add("is-open");
 
-        // Fetch all stores to filter candidate stores in the same city
-        fetch("/api/stores")
-            .then((res) => res.json())
-            .then((stores) => {
+        // Fetch all candidate SKU stock in one request instead of one request per store.
+        Promise.all([
+            fetch("/api/stores").then((res) => res.json()),
+            fetch(`/api/inventory/live?product_id=${encodeURIComponent(product.Product_ID)}`).then((res) => res.json()),
+        ])
+            .then(([stores, inventory]) => {
+                const inventoryByStore = new Map(inventory.map((item) => [item.Store_ID, item]));
                 const sameCityStores = stores
                     .filter((s) => s.City === targetStore.City && s.Store_ID !== targetStore.Store_ID)
                     .map((s) => {
                         const dist = calcHaversineDistance(targetStore.Latitude, targetStore.Longitude, s.Latitude, s.Longitude);
-                        return { ...s, distance: dist };
+                        return buildInventoryCandidate({ ...s, distance: dist }, inventoryByStore.get(s.Store_ID));
                     });
-
-                return Promise.all(sameCityStores.map((store) => getInventoryForProduct(store, product.Product_ID)));
+                return sameCityStores;
             })
             .then((inventoryCandidates) => {
                 const sourceAvailableStock = Number.isFinite(Number(product.Available_Stock))
@@ -459,6 +464,7 @@
                 if (window.showStoreInventoryDrawer) {
                     window.showStoreInventoryDrawer(currentTargetStore);
                 }
+                if (window.invalidateKpiSummaryCache) window.invalidateKpiSummaryCache();
             })
             .catch((err) => {
                 console.error("Transfer error:", err);

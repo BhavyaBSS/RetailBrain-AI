@@ -8,6 +8,28 @@
     let currentAuditHistory = [];
     let showRemovedAuditRows = false;
     let hiddenAuditIdsCache = new Set();
+    let kpiSummaryCache = null;
+    let kpiSummaryCacheExpiresAt = 0;
+    let kpiSummaryRequest = null;
+
+    function fetchKpiSummary() {
+        if (kpiSummaryCache && Date.now() < kpiSummaryCacheExpiresAt) {
+            return Promise.resolve(kpiSummaryCache);
+        }
+        if (!kpiSummaryRequest) {
+            kpiSummaryRequest = fetch("/api/summary")
+                .then((res) => requireSuccessfulResponse(res, "Executive KPI"))
+                .then((data) => {
+                    kpiSummaryCache = data;
+                    kpiSummaryCacheExpiresAt = Date.now() + 10000;
+                    return data;
+                })
+                .finally(() => {
+                    kpiSummaryRequest = null;
+                });
+        }
+        return kpiSummaryRequest;
+    }
 
     function initGlobalNav() {
         const rightContainer = document.getElementById("header-nav-right");
@@ -66,6 +88,7 @@
         document.getElementById("nav-kpis-btn").onclick = openKPIsModal;
         document.getElementById("nav-forecast-btn").onclick = openForecastModal;
         document.getElementById("nav-history-btn").onclick = openHistoryModal;
+        fetchKpiSummary().catch(() => {});
     }
 
     function requireSuccessfulResponse(response, label) {
@@ -91,8 +114,7 @@
         const backdrop = document.getElementById("nav-modal-backdrop");
         backdrop.classList.add("is-open");
 
-        fetch("/api/summary")
-            .then((res) => requireSuccessfulResponse(res, "Executive KPI"))
+        fetchKpiSummary()
             .then((data) => {
                 const wape = Number(data.forecast_model_wape_overall ?? 0);
                 const forecastAccuracy = Math.max(0, (1 - wape) * 100);
@@ -142,6 +164,11 @@
                 body.innerHTML = '<div style="color: #ff4757; padding: 20px;">Failed to load executive KPIs.</div>';
             });
     }
+
+    window.invalidateKpiSummaryCache = function () {
+        kpiSummaryCache = null;
+        kpiSummaryCacheExpiresAt = 0;
+    };
 
     function loadAuditHistory({ render = true } = {}) {
         return Promise.all([

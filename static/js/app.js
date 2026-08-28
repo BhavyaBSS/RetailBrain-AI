@@ -174,6 +174,26 @@ document.addEventListener('DOMContentLoaded', () => {
             populateDropdownFilters();
             initSupplierSliders();
             initDataIngestionModal();
+
+            // Handle URL parameters for direct deep-linking from India Map & Store Drawer
+            const urlParams = new URLSearchParams(window.location.search);
+            const targetTab = urlParams.get('tab');
+            const targetStore = urlParams.get('store');
+            if (targetTab) {
+                switchTab(targetTab);
+            }
+            if (targetStore) {
+                const searchInput = document.getElementById('search-inventory');
+                if (searchInput) {
+                    searchInput.value = targetStore;
+                    searchInput.dispatchEvent(new Event('input'));
+                }
+                const storeFilter = document.getElementById('filter-store') || document.getElementById('store-filter');
+                if (storeFilter) {
+                    storeFilter.value = targetStore;
+                    storeFilter.dispatchEvent(new Event('change'));
+                }
+            }
         } catch (err) {
             console.error('Error fetching initial dataset:', err);
         }
@@ -235,11 +255,162 @@ document.addEventListener('DOMContentLoaded', () => {
             const res = await fetch('/api/stores');
             if (res.ok) {
                 state.storesData = await res.json();
+                renderStoreGallery(state.storesData);
             }
         } catch (e) {
             console.error('Stores fetch error:', e);
         }
     }
+
+    function renderStoreGallery(stores) {
+        const container = document.getElementById('store-gallery-container');
+        if (!container) return;
+
+        let cityFilter = document.getElementById('filter-transfer-city') ? document.getElementById('filter-transfer-city').value : 'all';
+        let storeFilter = document.getElementById('filter-inv-store') ? document.getElementById('filter-inv-store').value : 'all';
+        let searchQ = document.getElementById('search-inventory') ? document.getElementById('search-inventory').value.toLowerCase().trim() : '';
+
+        let list = stores || state.storesData || [];
+        if (cityFilter && cityFilter !== 'all') {
+            list = list.filter(s => (s.City || '').toLowerCase() === cityFilter.toLowerCase());
+        }
+        if (storeFilter && storeFilter !== 'all') {
+            list = list.filter(s => s.Store_ID === storeFilter);
+        }
+        if (searchQ) {
+            list = list.filter(s => 
+                (s.Store_Name || '').toLowerCase().includes(searchQ) ||
+                (s.Locality || '').toLowerCase().includes(searchQ) ||
+                (s.Store_ID || '').toLowerCase().includes(searchQ) ||
+                (s.City || '').toLowerCase().includes(searchQ)
+            );
+        }
+
+        if (list.length === 0) {
+            container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: var(--text-muted); padding: 30px;">No matching dark stores found.</div>';
+            return;
+        }
+
+        container.innerHTML = list.map(store => {
+            const num = parseInt(String(store.Store_ID).replace('BST-', '')) || 1;
+            const imgIdx = ((num - 1) % 25) + 1;
+            const photoUrl = store.photo_url || `/static/images/stores/real_store_${imgIdx}.jpg`;
+            const photoType = store.photo_type || "Real Dark Store Photography";
+            const health = store.health_score ?? 100;
+            const alerts = store.reorder_alerts_count || 0;
+            const statusClass = health >= 85 ? 'pill-success' : (health >= 70 ? 'pill-warning' : 'pill-danger');
+            const statusText = health >= 85 ? 'Optimal' : (health >= 70 ? 'Attention' : 'Critical');
+
+            return `
+                <div class="store-photo-card glass-card" data-store-id="${store.Store_ID}">
+                    <div class="store-photo-header">
+                        <img src="${photoUrl}" alt="${store.Store_Name}" class="store-photo-img" loading="lazy"/>
+                        <div class="store-photo-overlay-top">
+                            <span class="store-tag-badge">${photoType}</span>
+                            <span class="pill-badge ${statusClass}">${statusText}</span>
+                        </div>
+                        <button class="store-photo-expand-btn" data-store-id="${store.Store_ID}" title="View Full Size Photo">
+                            <i data-lucide="maximize-2"></i>
+                        </button>
+                    </div>
+                    <div class="store-photo-body">
+                        <div class="store-photo-title-row">
+                            <h4 class="store-card-name">${store.Store_Name}</h4>
+                            <span class="store-id-chip">${store.Store_ID}</span>
+                        </div>
+                        <div class="store-card-locality">${store.Locality}, <strong>${store.City}</strong></div>
+                        <div class="store-card-meta">
+                            <div class="meta-item">
+                                <span class="meta-lbl">Capacity</span>
+                                <span class="meta-val">${(store.Capacity || 5000).toLocaleString()} units</span>
+                            </div>
+                            <div class="meta-item">
+                                <span class="meta-lbl">Health</span>
+                                <span class="meta-val" style="color: ${health >= 85 ? '#10b981' : '#f59e0b'};">${health}%</span>
+                            </div>
+                            <div class="meta-item">
+                                <span class="meta-lbl">Alerts</span>
+                                <span class="meta-val ${alerts > 0 ? 'alert-red' : ''}">${alerts} SKUs</span>
+                            </div>
+                        </div>
+                        <div class="store-card-actions">
+                            <button class="btn btn-outline btn-sm btn-open-store-drawer" data-store-id="${store.Store_ID}" style="width:100%; border-color: rgba(245, 197, 24, 0.4); color: #f5c518; background: rgba(245, 197, 24, 0.08);">
+                                <i data-lucide="boxes"></i> Open Live Store Drawer
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        if (window.lucide) lucide.createIcons();
+
+        // Bind click events on store photo cards & buttons
+        container.querySelectorAll('.store-photo-expand-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const sId = btn.getAttribute('data-store-id');
+                const storeObj = (state.storesData || []).find(s => s.Store_ID === sId);
+                if (storeObj) openPhotoLightbox(storeObj);
+            });
+        });
+
+        container.querySelectorAll('.btn-open-store-drawer').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const sId = btn.getAttribute('data-store-id');
+                const storeObj = (state.storesData || []).find(s => s.Store_ID === sId);
+                if (storeObj && window.showStoreInventoryDrawer) {
+                    window.showStoreInventoryDrawer(storeObj);
+                }
+            });
+        });
+    }
+
+    function openPhotoLightbox(store) {
+        const modal = document.getElementById('modal-store-photo');
+        if (!modal) return;
+        const num = parseInt(String(store.Store_ID).replace('BST-', '')) || 1;
+        const imgIdx = ((num - 1) % 25) + 1;
+        const photoUrl = store.photo_url || `/static/images/stores/real_store_${imgIdx}.jpg`;
+        const photoType = store.photo_type || "Real Dark Store Photography";
+
+        const imgEl = document.getElementById('lightbox-img');
+        if (imgEl) imgEl.src = photoUrl;
+        const typeEl = document.getElementById('lightbox-type');
+        if (typeEl) typeEl.textContent = photoType;
+        const titleEl = document.getElementById('lightbox-title');
+        if (titleEl) titleEl.textContent = store.Store_Name;
+        const subEl = document.getElementById('lightbox-subtitle');
+        if (subEl) subEl.textContent = `${store.Locality}, ${store.City} • Capacity: ${(store.Capacity || 5000).toLocaleString()} units • Type: ${store.Store_Type || 'Dark Store'}`;
+        
+        const health = store.health_score ?? 100;
+        const pill = document.getElementById('lightbox-status-pill');
+        if (pill) {
+            pill.textContent = health >= 85 ? 'Optimal Stock' : (health >= 70 ? 'Reorder Warning' : 'Critical Stockout');
+            pill.className = `pill-badge ${health >= 85 ? 'pill-success' : (health >= 70 ? 'pill-warning' : 'pill-danger')}`;
+        }
+
+        const drawerBtn = document.getElementById('lightbox-drawer-btn');
+        if (drawerBtn) {
+            drawerBtn.onclick = () => {
+                modal.style.display = 'none';
+                if (window.showStoreInventoryDrawer) window.showStoreInventoryDrawer(store);
+            };
+        }
+
+        modal.style.display = 'flex';
+    }
+
+    // Bind Lightbox close button
+    const closePhotoBtn = document.getElementById('btn-close-photo-modal');
+    if (closePhotoBtn) {
+        closePhotoBtn.addEventListener('click', () => {
+            const modal = document.getElementById('modal-store-photo');
+            if (modal) modal.style.display = 'none';
+        });
+    }
+
 
     async function fetchProducts() {
         try {
@@ -767,6 +938,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 filteredTransfers = filteredTransfers.filter(t => t.searchText.includes(q));
             }
             renderTransfersTable(filteredTransfers);
+
+            // Filter Store Photos Gallery
+            renderStoreGallery(state.storesData);
         }
 
         let inventorySearchTimer;

@@ -1,2 +1,6 @@
-
-[FATAL ERROR] API Worker exception: [Errno 2] No such file or directory: 'python'
+Traceback (most recent call last):
+  File "c:\Users\Sneha Chaudhary\AppData\Local\Packages\5319275A.WhatsAppDesktop_cv1g1gvanyjgm\LocalState\sessions\D1E3F640947BE2A3E64F0C5672FCD9F353E4F31B\transfers\2026-35\Project_changes\Project_changes\run_pipeline.py", line 14, in <module>
+    from src import demand_forecast as df_model
+  File "c:\Users\Sneha Chaudhary\AppData\Local\Packages\5319275A.WhatsAppDesktop_cv1g1gvanyjgm\LocalState\sessions\D1E3F640947BE2A3E64F0C5672FCD9F353E4F31B\transfers\2026-35\Project_changes\Project_changes\src\demand_forecast.py", line 11, in <module>
+    import lightgbm as lgb
+ModuleNotFoundError: No module named 'lightgbm'

@@ -578,6 +578,40 @@ def get_stores():
             st["reorder_alerts_count"] = reorder_counts.get(s_id, 0)
             st["health_score"] = max(60, 100 - (st["reorder_alerts_count"] * 2))
             st["status"] = "OPTIMAL" if st["health_score"] >= 85 else ("ATTENTION" if st["health_score"] >= 70 else "CRITICAL")
+            try:
+                num = int(str(s_id).replace("BST-", ""))
+            except ValueError:
+                num = 1
+            img_idx = ((num - 1) % 25) + 1
+            st["photo_url"] = f"/static/images/stores/real_store_{img_idx}.jpg"
+            photo_types = [
+                "Blinkit Grocery Aisle & Storage Shelves",
+                "Blinkit Dispatch Hub & Rider Staging Bay",
+                "Blinkit High-Density Picking Aisle & Racks",
+                "Blinkit Order Packing & Sorting Station",
+                "Blinkit Cold Room & Fresh Dairy Storage",
+                "Blinkit Fast-Fulfillment Grocery Shelves",
+                "Blinkit Rider Loading & Bagging Bay",
+                "Blinkit High-Bay Inventory Picking Aisle",
+                "Blinkit Rapid Order Sorting Counter",
+                "Blinkit Refrigerated Beverage & Dairy Vault",
+                "Blinkit Quick-Commerce Micro-Warehouse",
+                "Blinkit Delivery Fleet Dispatch Hub",
+                "Blinkit SKU Barcode Scanning & Staging",
+                "Blinkit High-Velocity Order Packing Bay",
+                "Blinkit Walk-In Cold Chain Facility",
+                "Blinkit Hyperlocal Grocery Fulfillment Aisle",
+                "Blinkit Express Rider Staging Area",
+                "Blinkit Automated Storage & Picking Line",
+                "Blinkit Digital Packing & Scale Station",
+                "Blinkit Temperature-Controlled Dairy Storage",
+                "Blinkit FMCG Grocery Inventory Racks",
+                "Blinkit Central Delivery Logistics Hub",
+                "Blinkit Fast-Moving SKU Picking Aisle",
+                "Blinkit Order Bagging & Quality Check Desk",
+                "Blinkit Cold-Chain Dairy & Fresh Vault"
+            ]
+            st["photo_type"] = photo_types[img_idx - 1]
             
         return records
     except Exception as e:
@@ -600,10 +634,16 @@ def get_products():
 
 
 @app.get("/api/inventory/live")
-def get_live_inventory(store_id: Optional[str] = None, category: Optional[str] = None):
+def get_live_inventory(
+    store_id: Optional[str] = None,
+    category: Optional[str] = None,
+    product_id: Optional[str] = None,
+):
     """Returns granular live stock telemetry with stockout risk indicators."""
     try:
         inv = dl.load_inventory()
+        if product_id and product_id.lower() != "all":
+            inv = inv[inv["Product_ID"].str.lower() == product_id.lower()]
         prods = dl.load_products()
         stores = dl.load_stores()
         
@@ -616,8 +656,14 @@ def get_live_inventory(store_id: Optional[str] = None, category: Optional[str] =
             merged = merged[merged["Category"].str.lower() == category.lower()]
             
         # Classify risk state using the same shared rule as /api/stores
-        merged["Risk_State"] = merged.apply(
-            lambda row: classify_stock_risk(row["Current_Stock"], row["Safety_Stock"]), axis=1
+        merged["Risk_State"] = np.select(
+            [
+                merged["Current_Stock"] <= merged["Safety_Stock"] * 0.5,
+                merged["Current_Stock"] <= merged["Safety_Stock"],
+                merged["Current_Stock"] >= merged["Safety_Stock"] * 3.5,
+            ],
+            ["CRITICAL_STOCKOUT", "REORDER_NEEDED", "OVERSTOCKED"],
+            default="OPTIMAL",
         )
         merged["Available_Stock"] = merged["Current_Stock"] - merged["Reserved_Stock"]
         
@@ -625,6 +671,44 @@ def get_live_inventory(store_id: Optional[str] = None, category: Optional[str] =
     except Exception as e:
         logger.error(f"Error fetching live inventory: {e}")
         raise HTTPException(status_code=500, detail="Error fetching live inventory.")
+
+
+@app.post("/api/inventory/adjust-stock")
+def adjust_live_stock(
+    store_id: str = Body(..., embed=True),
+    product_id: str = Body(..., embed=True),
+    qty_change: Optional[int] = Body(None, embed=True),
+    new_stock: Optional[int] = Body(None, embed=True)
+):
+    """
+    Directly adjusts or sets live stock for a SKU in a store, persisting to DB and CSV.
+    """
+    try:
+        inv = dl.load_inventory()
+        mask = (inv["Store_ID"] == store_id) & (inv["Product_ID"] == product_id)
+        current_val = int(inv.loc[mask, "Current_Stock"].values[0]) if mask.any() else 0
+
+        if new_stock is not None:
+            delta = max(0, new_stock) - current_val
+        elif qty_change is not None:
+            delta = qty_change
+        else:
+            delta = 0
+
+        db.update_inventory_stock(store_id, product_id, delta)
+        invalidate_live_operations_cache()
+
+        updated_stock = max(0, current_val + delta)
+        return {
+            "success": True,
+            "store_id": store_id,
+            "product_id": product_id,
+            "new_stock": updated_stock,
+            "delta": delta
+        }
+    except Exception as e:
+        logger.error(f"Error adjusting live stock: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.get("/api/forecast-chart")

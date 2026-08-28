@@ -6,8 +6,8 @@
 .inventory-drawer-backdrop {
     position: fixed;
     inset: 0;
-    z-index: 100;
-    background: rgba(5, 7, 13, 0.75);
+    z-index: 10000;
+    background: rgba(5, 7, 13, 0.78);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
     display: flex;
@@ -26,16 +26,16 @@
 /* Centered Modal Panel */
 .inventory-drawer {
     position: relative;
-    width: clamp(380px, 60vw, 780px);
+    width: clamp(380px, 62vw, 820px);
     max-height: 88vh;
     border-radius: 20px;
-    background: rgba(11, 15, 26, 0.97);
-    border: 1px solid rgba(0, 242, 254, 0.25);
-    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7);
+    background: rgba(11, 15, 26, 0.98);
+    border: 1px solid rgba(0, 242, 254, 0.35);
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85);
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    z-index: 101;
+    z-index: 10001;
     transform: scale(0.95);
     opacity: 0;
     transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease;
@@ -46,9 +46,63 @@
     opacity: 1;
 }
 
+/* Store Photo Banner with Badges */
+.drawer-store-banner {
+    position: relative;
+    width: 100%;
+    height: 230px;
+    overflow: hidden;
+    background: #000;
+    border-bottom: 1px solid rgba(0, 242, 254, 0.2);
+}
+
+.drawer-store-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.drawer-photo-overlay {
+    position: absolute;
+    bottom: 12px;
+    left: 14px;
+    right: 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.drawer-photo-tag {
+    background: #f5c518;
+    color: #050b14;
+    font-family: var(--font-heading, 'Outfit', sans-serif);
+    font-weight: 800;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 5px 10px;
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
+}
+
+.drawer-type-tag {
+    background: rgba(0, 242, 254, 0.18);
+    border: 1px solid rgba(0, 242, 254, 0.45);
+    color: #00f2fe;
+    font-weight: 700;
+    font-size: 0.72rem;
+    padding: 5px 10px;
+    border-radius: 6px;
+    backdrop-filter: blur(6px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
+}
+
 /* Drawer Header */
 .drawer-header {
-    padding: 24px 28px 20px;
+    padding: 20px 24px 16px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     background: rgba(7, 9, 14, 0.6);
 }
@@ -56,14 +110,14 @@
 .drawer-header-top {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
+    align-items: center;
     gap: 16px;
     margin-bottom: 12px;
 }
 
 .drawer-title {
     font-family: var(--font-heading, 'Outfit', sans-serif);
-    font-size: 1.4rem;
+    font-size: 1.35rem;
     font-weight: 700;
     color: var(--text-primary, #ffffff);
     margin: 0;
@@ -73,6 +127,36 @@
     font-size: 0.85rem;
     color: var(--color-cyan, #00f2fe);
     margin-top: 2px;
+}
+
+.drawer-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.drawer-dashboard-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--color-cyan, #00f2fe);
+    background: rgba(0, 242, 254, 0.1);
+    border: 1px solid rgba(0, 242, 254, 0.3);
+    padding: 6px 14px;
+    border-radius: 20px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.drawer-dashboard-btn:hover {
+    background: rgba(0, 242, 254, 0.2);
+    color: #ffffff;
+    border-color: rgba(0, 242, 254, 0.6);
+    box-shadow: 0 0 12px rgba(0, 242, 254, 0.35);
+    transform: translateY(-1px);
 }
 
 .drawer-close-btn {
@@ -305,9 +389,52 @@
 .sku-progress-labels {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     font-size: 0.75rem;
     color: #94a3b8;
-    margin-bottom: 4px;
+    margin-bottom: 6px;
+}
+
+.sku-live-adjuster {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.stock-btn-group {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.btn-stock-adj {
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #ffffff;
+    font-size: 0.85rem;
+    font-weight: 700;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    padding: 0;
+}
+
+.btn-stock-adj:hover {
+    background: var(--color-cyan, #00f2fe);
+    color: #050b14;
+    border-color: var(--color-cyan, #00f2fe);
+    transform: scale(1.15);
+    box-shadow: 0 0 8px rgba(0, 242, 254, 0.6);
+}
+
+.btn-stock-adj:active {
+    transform: scale(0.92);
 }
 
 .sku-progress-bar {
@@ -374,7 +501,7 @@
 .action-modal-backdrop {
     position: fixed;
     inset: 0;
-    z-index: 200;
+    z-index: 10010;
     background: rgba(5, 7, 13, 0.8);
     backdrop-filter: blur(10px);
     display: flex;
@@ -507,9 +634,65 @@
     color: #ffffff;
 }
 
+}
+
+/* ---------- Drawer Store Photo Banner ---------- */
+.drawer-store-banner {
+    position: relative;
+    width: 100%;
+    height: 180px;
+    overflow: hidden;
+    background: #090d16;
+}
+
+.drawer-store-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    transition: transform 0.5s ease;
+}
+
+.inventory-drawer:hover .drawer-store-img {
+    transform: scale(1.04);
+}
+
+.drawer-photo-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(11, 15, 26, 0.95) 0%, rgba(11, 15, 26, 0.3) 50%, rgba(0, 0, 0, 0.1) 100%);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding: 12px 20px;
+}
+
+.drawer-photo-tag {
+    background: rgba(245, 197, 24, 0.9);
+    color: #0b0f1a;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.drawer-type-tag {
+    background: rgba(0, 242, 254, 0.2);
+    color: #00f2fe;
+    border: 1px solid rgba(0, 242, 254, 0.4);
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 6px;
+}
+
 /* ---------- Responsive: tablets & phones ---------- */
 @media (max-width: 560px) {
     .inventory-drawer { width: 94vw; max-height: 92vh; border-radius: 16px; }
+    .drawer-store-banner { height: 140px; }
     .drawer-header { padding: 18px 16px 16px; }
     .drawer-title { font-size: 1.15rem; }
     .drawer-controls { padding: 12px 16px; }
@@ -518,3 +701,4 @@
     .sku-grid { grid-template-columns: 1fr; }
     .action-modal { padding: 20px; }
 }
+

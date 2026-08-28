@@ -382,7 +382,82 @@
     }
 
     // ---------------------------------------------------------------
-    // 5. City View (All-India)
+    // 5. Smart Tooltip & Marker Spatial De-cluttering
+    // ---------------------------------------------------------------
+    function attachSmartTooltipBehavior(el, infoEl) {
+        let closeTimer = null;
+
+        const updatePlacement = () => {
+            if (closeTimer) clearTimeout(closeTimer);
+            el.classList.add("is-active");
+
+            const rect = el.getBoundingClientRect();
+            const infoHeight = 310;
+            const infoWidth = 270;
+
+            // Flip vertically if close to top header or upper screen bound
+            if (rect.top < infoHeight + 35) {
+                infoEl.classList.add("flip-bottom");
+            } else {
+                infoEl.classList.remove("flip-bottom");
+            }
+
+            // Align horizontally if close to screen left/right bounds
+            if (rect.left < infoWidth / 2 + 25) {
+                infoEl.classList.add("align-left");
+                infoEl.classList.remove("align-right");
+            } else if (window.innerWidth - rect.right < infoWidth / 2 + 25) {
+                infoEl.classList.add("align-right");
+                infoEl.classList.remove("align-left");
+            } else {
+                infoEl.classList.remove("align-left");
+                infoEl.classList.remove("align-right");
+            }
+        };
+
+        const handleLeave = () => {
+            closeTimer = setTimeout(() => {
+                el.classList.remove("is-active");
+            }, 300);
+        };
+
+        el.addEventListener("mouseenter", updatePlacement);
+        el.addEventListener("touchstart", updatePlacement, { passive: true });
+        el.addEventListener("mouseleave", handleLeave);
+    }
+
+    function spreadOverlappingStoreCoords(stores) {
+        const adjustedStores = stores.map((s, idx) => ({
+            ...s,
+            origIdx: idx,
+            adjLat: Number(s.Latitude),
+            adjLon: Number(s.Longitude),
+        }));
+        const THRESHOLD = 0.0035; // ~350m proximity threshold
+
+        for (let i = 0; i < adjustedStores.length; i++) {
+            const cluster = [adjustedStores[i]];
+            for (let j = i + 1; j < adjustedStores.length; j++) {
+                const dLat = Math.abs(adjustedStores[i].Latitude - adjustedStores[j].Latitude);
+                const dLon = Math.abs(adjustedStores[i].Longitude - adjustedStores[j].Longitude);
+                if (dLat < THRESHOLD && dLon < THRESHOLD) {
+                    cluster.push(adjustedStores[j]);
+                }
+            }
+            if (cluster.length > 1) {
+                const radius = 0.0032;
+                cluster.forEach((item, k) => {
+                    const angle = (2 * Math.PI / cluster.length) * k;
+                    item.adjLon = Number(item.Longitude) + radius * Math.cos(angle);
+                    item.adjLat = Number(item.Latitude) + radius * Math.sin(angle);
+                });
+            }
+        }
+        return adjustedStores;
+    }
+
+    // ---------------------------------------------------------------
+    // 6. City View (All-India)
     // ---------------------------------------------------------------
     function renderCityMarkers() {
         CITIES.forEach((city) => {
@@ -414,6 +489,7 @@
             el.appendChild(dot);
             el.appendChild(label);
 
+            attachSmartTooltipBehavior(el, info);
             el.addEventListener("click", () => onCityClick(city));
 
             const m = new maplibregl.Marker({ element: el, anchor: "center" })
@@ -457,8 +533,63 @@
         }
     }
 
+    function getShortStoreName(store) {
+        let name = (store.Locality || store.Store_Name || "")
+            .replace(/^Blinkit\s+/i, "")
+            .replace(/\s+Store$/i, "")
+            .replace(/\s*\([^)]*\)/g, "")
+            .trim();
+        name = name
+            .replace(/Sector\s*/gi, "Sec ")
+            .replace(/Phase\s*/gi, "Ph ")
+            .replace(/Road/gi, "Rd")
+            .replace(/Connaught Place/gi, "Connaught Pl")
+            .replace(/Greater Kailash 2/gi, "GK 2")
+            .replace(/Greater Kailash/gi, "GK");
+        return name;
+    }
+
+    function assignSmartLabelPositions(stores) {
+        return stores.map((s, i) => {
+            let bestDir = "bottom";
+            const lat = s.adjLat ?? Number(s.Latitude);
+            const lon = s.adjLon ?? Number(s.Longitude);
+
+            let nearestDist = Infinity;
+            let nearestDx = 0;
+            let nearestDy = 0;
+
+            stores.forEach((other, j) => {
+                if (i === j) return;
+                const oLat = other.adjLat ?? Number(other.Latitude);
+                const oLon = other.adjLon ?? Number(other.Longitude);
+                const dx = oLon - lon;
+                const dy = oLat - lat;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < nearestDist) {
+                    nearestDist = dist;
+                    nearestDx = dx;
+                    nearestDy = dy;
+                }
+            });
+
+            if (nearestDist < 0.09) {
+                if (Math.abs(nearestDx) > Math.abs(nearestDy) * 0.8) {
+                    bestDir = nearestDx > 0 ? "left" : "right";
+                } else {
+                    bestDir = nearestDy > 0 ? "bottom" : "top";
+                }
+            } else {
+                const dirs = ["bottom", "top", "right", "left"];
+                bestDir = dirs[i % dirs.length];
+            }
+
+            return { ...s, labelDir: bestDir };
+        });
+    }
+
     // ---------------------------------------------------------------
-    // 6. Store Markers View (Chosen City)
+    // 7. Store Markers View (Chosen City)
     // ---------------------------------------------------------------
     function renderStoreMarkers(cityName) {
         fetch("/api/stores")
@@ -469,7 +600,10 @@
                 fitMapToCityStores(cityStores);
                 addSelectedCityBoundary(activeCity, cityStores);
 
-                cityStores.forEach((s) => {
+                const spreadStores = spreadOverlappingStoreCoords(cityStores);
+                const positionedStores = assignSmartLabelPositions(spreadStores);
+
+                positionedStores.forEach((s) => {
                     const el = document.createElement("div");
                     el.className = "store-marker";
                     el.setAttribute("data-store-id", s.Store_ID);
@@ -478,12 +612,21 @@
                     dot.className = `store-dot ${s.reorder_alerts_count > 0 ? "has-alert" : ""}`;
 
                     const label = document.createElement("div");
-                    label.className = "store-label";
-                    label.textContent = s.Store_Name.replace(` (${s.City})`, "").replace(`${s.City} `, "");
+                    label.className = `store-label label-pos-${s.labelDir || "bottom"}`;
+                    label.textContent = getShortStoreName(s);
+
+                    const num = parseInt(String(s.Store_ID).replace('BST-', '')) || 1;
+                    const imgIdx = ((num - 1) % 25) + 1;
+                    const photoUrl = s.photo_url || `/static/images/stores/real_store_${imgIdx}.jpg`;
+                    const photoType = s.photo_type || "Real Dark Store Photography";
 
                     const info = document.createElement("div");
                     info.className = "store-info";
                     info.innerHTML = `
+                        <div class="store-info-photo-wrap">
+                            <img src="${photoUrl}" alt="${s.Store_Name}" class="store-info-photo"/>
+                            <span class="store-photo-badge">${photoType}</span>
+                        </div>
                         <div class="store-info-title">${s.Store_Name}</div>
                         <div class="store-info-locality">${s.Locality}, ${s.City}</div>
                         <div class="store-info-row">
@@ -498,17 +641,42 @@
                             <span>Reorder Alerts</span>
                             <span class="value ${s.reorder_alerts_count > 0 ? 'alert' : ''}">${s.reorder_alerts_count || 0}</span>
                         </div>
-                        <div class="store-click-hint">Click to inspect inventory</div>
+                        <div class="store-info-actions">
+                            <button class="store-quick-inspect-btn" type="button">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="display:inline-block; vertical-align:-2px; margin-right:4px;"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+                                Open Live Store Drawer
+                            </button>
+                        </div>
                     `;
 
                     el.appendChild(info);
                     el.appendChild(dot);
                     el.appendChild(label);
 
-                    el.addEventListener("click", () => onStoreClick(s));
+                    attachSmartTooltipBehavior(el, info);
+
+                    // Ensure clicking the dot, label, card or inspect button all reliably open the drawer
+                    dot.addEventListener("click", (e) => {
+                        e.stopPropagation();
+                        onStoreClick(s);
+                    });
+                    label.addEventListener("click", (e) => {
+                        e.stopPropagation();
+                        onStoreClick(s);
+                    });
+                    info.addEventListener("click", (e) => {
+                        // If clicking dashboard link, let link navigate; otherwise open drawer
+                        if (e.target.closest(".store-quick-dash-btn")) return;
+                        e.stopPropagation();
+                        onStoreClick(s);
+                    });
+                    el.addEventListener("click", (e) => {
+                        if (e.target.closest(".store-quick-dash-btn")) return;
+                        onStoreClick(s);
+                    });
 
                     const m = new maplibregl.Marker({ element: el, anchor: "center" })
-                        .setLngLat([s.Longitude, s.Latitude])
+                        .setLngLat([s.adjLon ?? s.Longitude, s.adjLat ?? s.Latitude])
                         .addTo(map);
                     activeMarkers.push(m);
                 });
@@ -546,10 +714,10 @@
 
         const compactLayout = window.innerWidth < 720;
         const cameraPadding = {
-            top: compactLayout ? 150 : 220,
-            right: compactLayout ? 32 : 130,
+            top: compactLayout ? 160 : 230,
+            right: compactLayout ? 36 : 130,
             bottom: compactLayout ? 72 : 125,
-            left: compactLayout ? 32 : 130,
+            left: compactLayout ? 36 : 130,
         };
         const camera = map.cameraForBounds(viewBounds, {
             padding: cameraPadding,

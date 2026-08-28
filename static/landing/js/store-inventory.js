@@ -16,13 +16,26 @@
         backdrop.className = "inventory-drawer-backdrop";
         backdrop.innerHTML = `
             <div class="inventory-drawer" id="inventory-drawer">
+                <div class="drawer-store-banner">
+                    <img id="drawer-store-img" src="/static/images/stores/store_1.jpg" alt="Blinkit Dark Store" class="drawer-store-img"/>
+                    <div class="drawer-photo-overlay">
+                        <span class="drawer-photo-tag" id="drawer-photo-tag">Blinkit Dark Store Photo</span>
+                        <span class="drawer-type-tag" id="drawer-store-type">Hyperlocal Dark Store</span>
+                    </div>
+                </div>
                 <div class="drawer-header">
                     <div class="drawer-header-top">
                         <div>
                             <h2 class="drawer-title" id="drawer-store-name">Store Inventory</h2>
                             <div class="drawer-subtitle" id="drawer-store-locality">Locality</div>
                         </div>
-                        <button class="drawer-close-btn" id="drawer-close-btn">&times;</button>
+                        <div class="drawer-header-actions">
+                            <a id="drawer-dashboard-link" class="drawer-dashboard-btn" href="/dashboard?tab=inventory" title="Classic Dashboard">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                <span>Classic Dashboard</span>
+                            </a>
+                            <button class="drawer-close-btn" id="drawer-close-btn" aria-label="Close">&times;</button>
+                        </div>
                     </div>
                     <div class="drawer-stats-bar">
                         <div class="stat-item">
@@ -127,10 +140,25 @@
 
         document.getElementById("drawer-store-name").textContent = store.Store_Name;
         document.getElementById("drawer-store-locality").textContent = `${store.Locality}, ${store.City}`;
+        
+        const num = parseInt(String(store.Store_ID).replace('BST-', '')) || 1;
+        const imgIdx = ((num - 1) % 25) + 1;
+        const photoUrl = store.photo_url || `/static/images/stores/real_store_${imgIdx}.jpg`;
+        const photoType = store.photo_type || "Real Dark Store Photography";
+
+        const imgEl = document.getElementById("drawer-store-img");
+        if (imgEl) imgEl.src = photoUrl;
+        const photoTagEl = document.getElementById("drawer-photo-tag");
+        if (photoTagEl) photoTagEl.textContent = photoType;
+        const typeTagEl = document.getElementById("drawer-store-type");
+        if (typeTagEl) typeTagEl.textContent = store.Store_Type || "Quick Commerce Dark Store";
+
+        const dashLink = document.getElementById("drawer-dashboard-link");
+        if (dashLink) {
+            dashLink.href = `/dashboard?tab=inventory&store=${encodeURIComponent(store.Store_ID)}`;
+        }
+
         // Show the last-known values immediately so the drawer isn't blank
-        // while data loads, but these get overwritten below with live
-        // numbers computed from the actual SKU data — never left stale
-        // after a transfer/purchase changes stock.
         document.getElementById("drawer-stat-health").textContent = `${store.health_score ?? 100}%`;
         document.getElementById("drawer-stat-alerts").textContent = store.reorder_alerts_count || 0;
 
@@ -145,12 +173,7 @@
                 storeInventoryData = data;
                 document.getElementById("drawer-stat-total-skus").textContent = data.length;
 
-                // Compute Health Score / Reorder Alerts directly from this
-                // same live SKU list, instead of trusting the store object's
-                // (possibly stale) precomputed values. This guarantees the
-                // header always matches what the SKU cards below actually
-                // show, and updates correctly right after any transfer or
-                // purchase order changes stock.
+                // Compute Health Score / Reorder Alerts directly from this live SKU list
                 const needsReorderCount = data.filter(
                     (item) => item.Risk_State === "CRITICAL_STOCKOUT" || item.Risk_State === "REORDER_NEEDED"
                 ).length;
@@ -170,6 +193,53 @@
         const backdrop = document.getElementById("inventory-drawer-backdrop");
         if (backdrop) backdrop.classList.remove("is-open");
     }
+
+    window.adjustLiveStock = async function(productId, delta) {
+        const item = storeInventoryData.find(i => i.Product_ID === productId);
+        if (!item || !currentStore) return;
+        
+        const currentStock = item.Current_Stock || 0;
+        const newStock = Math.max(0, currentStock + delta);
+        item.Current_Stock = newStock;
+        
+        // Reclassify risk state immediately
+        const safety = item.Safety_Stock || 0;
+        if (newStock <= safety * 0.5) {
+            item.Risk_State = "CRITICAL_STOCKOUT";
+        } else if (newStock <= safety) {
+            item.Risk_State = "REORDER_NEEDED";
+        } else if (newStock >= safety * 3.5) {
+            item.Risk_State = "OVERSTOCKED";
+        } else {
+            item.Risk_State = "OPTIMAL";
+        }
+
+        // Recalculate and update header stats live
+        const needsReorderCount = storeInventoryData.filter(
+            (i) => i.Risk_State === "CRITICAL_STOCKOUT" || i.Risk_State === "REORDER_NEEDED"
+        ).length;
+        const liveHealthScore = Math.max(60, 100 - (needsReorderCount * 2));
+        document.getElementById("drawer-stat-alerts").textContent = needsReorderCount;
+        document.getElementById("drawer-stat-health").textContent = `${liveHealthScore}%`;
+
+        // Re-render SKU grid smoothly
+        renderSKUGrid();
+
+        // Persist to backend asynchronously
+        try {
+            await fetch("/api/inventory/adjust-stock", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    store_id: currentStore.Store_ID,
+                    product_id: productId,
+                    qty_change: delta
+                })
+            });
+        } catch (e) {
+            console.error("Failed to persist live stock adjustment:", e);
+        }
+    };
 
     function renderSKUGrid() {
         const gridContainer = document.getElementById("sku-grid-container");
@@ -217,7 +287,13 @@
                         <div>
                             <div class="sku-progress-container">
                                 <div class="sku-progress-labels">
-                                    <span>Stock: <b>${stock}</b></span>
+                                    <div class="sku-live-adjuster">
+                                        <span>Stock: <b>${stock}</b></span>
+                                        <div class="stock-btn-group">
+                                            <button class="btn-stock-adj minus" onclick="window.adjustLiveStock('${item.Product_ID}', -1)" title="Decrease Stock by 1">-</button>
+                                            <button class="btn-stock-adj plus" onclick="window.adjustLiveStock('${item.Product_ID}', 1)" title="Increase Stock by 1">+</button>
+                                        </div>
+                                    </div>
                                     <span>Cap: ${maxCap}</span>
                                 </div>
                                 <div class="sku-progress-bar">
