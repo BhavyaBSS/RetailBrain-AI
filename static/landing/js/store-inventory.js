@@ -16,55 +16,59 @@
         backdrop.className = "inventory-drawer-backdrop";
         backdrop.innerHTML = `
             <div class="inventory-drawer" id="inventory-drawer">
-                <div class="drawer-store-banner">
+                <div class="drawer-media-col">
                     <img id="drawer-store-img" src="/static/images/stores/store_1.jpg" alt="Blinkit Dark Store" class="drawer-store-img"/>
-                    <div class="drawer-photo-overlay">
+                    <div class="drawer-media-gradient"></div>
+                    <div class="drawer-media-topbar">
                         <span class="drawer-photo-tag" id="drawer-photo-tag">Blinkit Dark Store Photo</span>
                         <span class="drawer-type-tag" id="drawer-store-type">Hyperlocal Dark Store</span>
                     </div>
-                </div>
-                <div class="drawer-header">
-                    <div class="drawer-header-top">
-                        <div>
-                            <h2 class="drawer-title" id="drawer-store-name">Store Inventory</h2>
-                            <div class="drawer-subtitle" id="drawer-store-locality">Locality</div>
-                        </div>
-                        <div class="drawer-header-actions">
-                            <a id="drawer-dashboard-link" class="drawer-dashboard-btn" href="/dashboard?tab=inventory" title="Classic Dashboard">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-                                <span>Classic Dashboard</span>
-                            </a>
-                            <button class="drawer-close-btn" id="drawer-close-btn" aria-label="Close">&times;</button>
-                        </div>
-                    </div>
-                    <div class="drawer-stats-bar">
-                        <div class="stat-item">
-                            <span class="stat-label">Health Score</span>
-                            <span class="stat-value" id="drawer-stat-health">--</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-label">Reorder Alerts</span>
-                            <span class="stat-value alert" id="drawer-stat-alerts">0</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-label">Total SKUs</span>
-                            <span class="stat-value" id="drawer-stat-total-skus">35</span>
-                        </div>
+                    <div class="drawer-media-caption">
+                        <h2 class="drawer-title" id="drawer-store-name">Store Inventory</h2>
+                        <div class="drawer-subtitle" id="drawer-store-locality">Locality</div>
                     </div>
                 </div>
 
-                <div class="drawer-controls">
-                    <input type="text" class="sku-search-input" id="sku-search-input" placeholder="Search product name or category...">
-                    <div class="sku-filter-pills">
-                        <button class="filter-pill active" data-filter="ALL">All SKUs</button>
-                        <button class="filter-pill pill-critical" data-filter="CRITICAL">Reorder Required</button>
-                        <button class="filter-pill pill-optimal" data-filter="OPTIMAL">Optimal</button>
-                        <button class="filter-pill pill-overstocked" data-filter="OVERSTOCKED">Overstocked</button>
+                <div class="drawer-content-col">
+                    <div class="drawer-header">
+                        <div class="drawer-header-top">
+                            <div class="drawer-header-actions">
+                                <a id="drawer-dashboard-link" class="drawer-dashboard-btn" href="/dashboard?tab=inventory" title="Classic Dashboard">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                                    <span>Classic Dashboard</span>
+                                </a>
+                                <button class="drawer-close-btn" id="drawer-close-btn" aria-label="Close">&times;</button>
+                            </div>
+                        </div>
+                        <div class="drawer-stats-bar">
+                            <div class="stat-item">
+                                <span class="stat-label">Health Score</span>
+                                <span class="stat-value" id="drawer-stat-health">--</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Reorder Alerts</span>
+                                <span class="stat-value alert" id="drawer-stat-alerts">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Total SKUs</span>
+                                <span class="stat-value" id="drawer-stat-total-skus">35</span>
+                            </div>
+                        </div>
                     </div>
-                </div>
 
-                <div class="drawer-body" id="drawer-sku-body">
-                    <div class="sku-grid" id="sku-grid-container"></div>
+                    <div class="drawer-controls">
+                        <input type="text" class="sku-search-input" id="sku-search-input" placeholder="Search product name or category...">
+                        <div class="sku-filter-pills">
+                            <button class="filter-pill active" data-filter="ALL">All SKUs</button>
+                            <button class="filter-pill pill-critical" data-filter="CRITICAL">Reorder Required</button>
+                            <button class="filter-pill pill-optimal" data-filter="OPTIMAL">Optimal</button>
+                            <button class="filter-pill pill-overstocked" data-filter="OVERSTOCKED">Overstocked</button>
+                        </div>
+                    </div>
+
+                    <div class="drawer-body" id="drawer-sku-body">
+                        <div class="sku-grid" id="sku-grid-container"></div>
+                    </div>
                 </div>
             </div>
         `;

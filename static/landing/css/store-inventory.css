@@ -23,17 +23,17 @@
     pointer-events: auto;
 }
 
-/* Centered Modal Panel */
+/* Centered Modal Panel — now a wide two-column layout: image left, data right */
 .inventory-drawer {
     position: relative;
-    width: clamp(380px, 62vw, 820px);
-    max-height: 88vh;
+    width: clamp(900px, 92vw, 1440px);
+    height: min(88vh, 900px);
     border-radius: 20px;
     background: rgba(11, 15, 26, 0.98);
     border: 1px solid rgba(0, 242, 254, 0.35);
     box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85);
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     overflow: hidden;
     z-index: 10001;
     transform: scale(0.95);
@@ -46,14 +46,15 @@
     opacity: 1;
 }
 
-/* Store Photo Banner with Badges */
-.drawer-store-banner {
+/* LEFT COLUMN — full-height hero image with the store name overlaid on a gradient */
+.drawer-media-col {
     position: relative;
-    width: 100%;
-    height: 230px;
+    width: 44%;
+    flex-shrink: 0;
+    height: 100%;
     overflow: hidden;
     background: #000;
-    border-bottom: 1px solid rgba(0, 242, 254, 0.2);
+    border-right: 1px solid rgba(0, 242, 254, 0.2);
 }
 
 .drawer-store-img {
@@ -63,15 +64,33 @@
     display: block;
 }
 
-.drawer-photo-overlay {
+.drawer-media-gradient {
     position: absolute;
-    bottom: 12px;
-    left: 14px;
-    right: 14px;
+    inset: 0;
+    background:
+        linear-gradient(180deg, rgba(5, 7, 13, 0.05) 0%, rgba(5, 7, 13, 0.15) 45%, rgba(5, 7, 13, 0.92) 100%),
+        linear-gradient(180deg, rgba(5, 7, 13, 0.55) 0%, rgba(5, 7, 13, 0) 22%);
+    pointer-events: none;
+    z-index: 1;
+}
+
+.drawer-media-topbar {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    right: 16px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     pointer-events: none;
+    z-index: 2;
+}
+
+.drawer-media-caption {
+    position: absolute;
+    bottom: 24px;
+    left: 24px;
+    right: 24px;
     z-index: 2;
 }
 
@@ -100,6 +119,16 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
 }
 
+/* RIGHT COLUMN — everything else, scrollable independently of the image */
+.drawer-content-col {
+    width: 56%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-width: 0;
+}
+
 /* Drawer Header */
 .drawer-header {
     padding: 20px 24px 16px;
@@ -109,7 +138,7 @@
 
 .drawer-header-top {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-end;
     align-items: center;
     gap: 16px;
     margin-bottom: 12px;
@@ -117,16 +146,18 @@
 
 .drawer-title {
     font-family: var(--font-heading, 'Outfit', sans-serif);
-    font-size: 1.35rem;
+    font-size: 1.9rem;
     font-weight: 700;
-    color: var(--text-primary, #ffffff);
+    color: #ffffff;
     margin: 0;
+    text-shadow: 0 2px 16px rgba(0, 0, 0, 0.8);
 }
 
 .drawer-subtitle {
-    font-size: 0.85rem;
+    font-size: 0.95rem;
     color: var(--color-cyan, #00f2fe);
-    margin-top: 2px;
+    margin-top: 4px;
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.8);
 }
 
 .drawer-header-actions {
@@ -632,4 +663,39 @@
 .action-modal-cancel:hover {
     background: rgba(255, 255, 255, 0.08);
     color: #ffffff;
+}
+
+/* ==========================================================================
+   Responsive — stack image above content on narrow / mobile screens
+   ========================================================================== */
+@media (max-width: 860px) {
+    .inventory-drawer {
+        width: 94vw;
+        height: 92vh;
+        flex-direction: column;
+    }
+
+    .drawer-media-col {
+        width: 100%;
+        height: 220px;
+        flex-shrink: 0;
+        border-right: none;
+        border-bottom: 1px solid rgba(0, 242, 254, 0.2);
+    }
+
+    .drawer-content-col {
+        width: 100%;
+        flex: 1;
+        min-height: 0;
+    }
+
+    .drawer-title {
+        font-size: 1.35rem;
+    }
+
+    .drawer-controls,
+    .drawer-body {
+        padding-left: 18px;
+        padding-right: 18px;
+    }
 }
